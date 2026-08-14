@@ -44,6 +44,11 @@
   --nav-bg:    rgba(252,252,251,.82);
   --grid-line: rgba(20,23,20,.055);
   --frame-bg:  #f2f3ef;
+
+  /* motion (theme independent) */
+  --ease:      cubic-bezier(.22,.68,0,1);      /* calm decelerate */
+  --ease-out:  cubic-bezier(.2,.7,.3,1);
+  --spring:    cubic-bezier(.34,1.4,.64,1);    /* slight overshoot */
 }
 
 html[data-theme="dark"] {
@@ -122,6 +127,19 @@ nav {
   transition: border-color .25s, background .25s;
 }
 nav.stuck { border-bottom-color: var(--border); }
+
+/* reading progress, sits on the nav's bottom edge */
+.progress {
+  position: absolute;
+  left: 0; bottom: -1px;
+  height: 2px;
+  width: 0;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity .3s var(--ease);
+  pointer-events: none;
+}
+nav.stuck .progress { opacity: 1; }
 
 .nav-in {
   max-width: 1080px;
@@ -277,7 +295,9 @@ h1 {
   transition: transform .18s, border-color .18s, box-shadow .18s;
 }
 .btn:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow-md); }
-.btn svg { width: 16px; height: 16px; flex: none; }
+.btn svg { width: 16px; height: 16px; flex: none; transition: transform .35s var(--spring); }
+/* the two downward arrows nudge down, hinting at what they do */
+.btn:hover svg.nudge { transform: translateY(3px); }
 .btn.solid {
   background: var(--accent);
   border-color: var(--accent);
@@ -285,20 +305,100 @@ h1 {
 }
 .btn.solid:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
 
+/* ---- hero photo stack -------------------------------------------------
+   At rest the peek cards sit exactly behind the main shot. On hover they
+   waterfall out to the left on a stagger, so it reads as a deck of photos
+   rather than a single image.                                          */
+.hero-stack { position: relative; }
+
+.peek {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: rotate(1.6deg);
+  transition: transform .6s var(--spring), opacity .4s var(--ease);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.peek img { width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+
 .hero-shot {
   margin: 0;
   position: relative;
+  z-index: 2;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
   transform: rotate(1.6deg);
-  transition: transform .45s cubic-bezier(.2,.7,.3,1);
+  transition: transform .55s var(--spring), box-shadow .45s var(--ease);
   cursor: zoom-in;
 }
-.hero-shot:hover { transform: rotate(0deg) scale(1.015); }
 .hero-shot .frame { position: relative; aspect-ratio: 3/4; overflow: hidden; }
-.hero-shot .frame img { width: 100%; height: 100%; object-fit: cover; }
+.hero-shot .frame img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .7s var(--ease);
+}
+
+/* photo counter, always visible so the affordance survives on touch */
+.hero-shot .count {
+  position: absolute;
+  top: 12px; left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: rgba(12,14,13,.62);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  color: #fff;
+  font-size: .74rem;
+  letter-spacing: .01em;
+  opacity: .82;
+  transition: opacity .3s var(--ease), transform .45s var(--spring);
+}
+.hero-shot .count svg { width: 13px; height: 13px; }
+.hero-shot .count b { font-weight: 650; }
+
+/* the lift applies on any hover-capable device */
+@media (hover: hover) {
+  .hero-stack:hover .hero-shot { transform: rotate(0deg) scale(1.02); }
+  .hero-stack:hover .hero-shot .frame img { transform: scale(1.04); }
+  .hero-stack:hover .hero-shot .count { opacity: 1; transform: translateY(-1px); }
+}
+
+/* below this the cards would reach the headline, so never render or fetch them */
+@media (max-width: 1079px) {
+  .peek { display: none; }
+}
+
+/* the fan needs both a pointer and room to fan into */
+@media (hover: hover) and (min-width: 1080px) {
+  /* mostly downward travel: keeps the cards clear of the headline */
+  .hero-stack:hover .p1 {
+    opacity: 1;
+    transform: translate(-34px, 24px) rotate(-4deg) scale(.95);
+    transition-delay: .02s;
+  }
+  .hero-stack:hover .p2 {
+    opacity: 1;
+    transform: translate(-62px, 48px) rotate(-8deg) scale(.9);
+    transition-delay: .07s;
+  }
+  .hero-stack:hover .p3 {
+    opacity: 1;
+    transform: translate(-88px, 72px) rotate(-12deg) scale(.85);
+    transition-delay: .12s;
+  }
+}
 .hero-shot figcaption {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -621,6 +721,12 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   border-radius: 8px;
   background: #fff;
 }
+/* re-triggered on every advance so each image eases in */
+.lb img.swap { animation: lbswap .34s var(--ease); }
+@keyframes lbswap {
+  from { opacity: 0; transform: scale(.965); }
+  to   { opacity: 1; transform: none; }
+}
 .lb-cap {
   position: absolute;
   left: 50%; bottom: 34px;
@@ -654,12 +760,31 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 /* ============================================================
    reveal
    ============================================================ */
-.js .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.2,.7,.3,1), transform .7s cubic-bezier(.2,.7,.3,1); }
+.js .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease-out), transform .7s var(--ease-out); }
 .js .rv.in { opacity: 1; transform: none; }
+
+/* gallery tiles arrive one after another rather than all at once */
+.js .stg > figure {
+  opacity: 0;
+  transform: translateY(18px) scale(.985);
+  transition: opacity .55s var(--ease-out), transform .55s var(--ease-out);
+}
+.js .stg.in > figure { opacity: 1; transform: none; }
+.stg > figure:nth-child(1) { transition-delay: 0s }
+.stg > figure:nth-child(2) { transition-delay: .06s }
+.stg > figure:nth-child(3) { transition-delay: .12s }
+.stg > figure:nth-child(4) { transition-delay: .18s }
+.stg > figure:nth-child(5) { transition-delay: .24s }
+.stg > figure:nth-child(6) { transition-delay: .30s }
+.stg > figure:nth-child(7) { transition-delay: .36s }
+.stg > figure:nth-child(8) { transition-delay: .42s }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .rv { opacity: 1; transform: none; transition: none; }
+  .js .stg > figure { opacity: 1; transform: none; transition: none; }
+  /* the fan is decoration, so drop it entirely rather than snapping it */
+  .peek { display: none; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
@@ -716,6 +841,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
   </div>
+  <div class="progress" id="prog"></div>
 </nav>
 
 <!-- ══════════════ hero ══════════════ -->
@@ -731,11 +857,11 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       </p>
       <div class="cta">
         <a class="btn solid" href="#work">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          <svg class="nudge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
           View the work
         </a>
         <a class="btn" href="Charles_Wang_Portfolio.pdf" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg class="nudge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Portfolio PDF
         </a>
         <a class="btn" href="mailto:wangcharles362@gmail.com">
@@ -745,12 +871,22 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       </div>
     </div>
 
-    <figure class="hero-shot" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
-      <div class="frame">
-        <img src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images">
-      </div>
-      <figcaption>LeafDoc · $50 handheld imaging attachment</figcaption>
-    </figure>
+    <div class="hero-stack">
+      <!-- decorative peek cards: they fan out on hover to show more exists -->
+      <span class="peek p3" aria-hidden="true"><img src="images/leafdoc-app-ai.webp" alt="" loading="lazy"></span>
+      <span class="peek p2" aria-hidden="true"><img src="images/leafdoc-app-frames.webp" alt="" loading="lazy"></span>
+      <span class="peek p1" aria-hidden="true"><img src="images/leafdoc-revisions.webp" alt="" loading="lazy"></span>
+
+      <figure class="hero-shot" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
+        <div class="frame">
+          <img src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images">
+          <span class="count">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>
+            <b id="shotCount">20</b>&nbsp;photos</span>
+        </div>
+        <figcaption>LeafDoc · $50 handheld imaging attachment</figcaption>
+      </figure>
+    </div>
   </div>
 </header>
 
@@ -821,7 +957,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
         </div>
       </div>
 
-      <div class="gallery">
+      <div class="gallery stg">
         <figure class="shot" data-lb data-cap="Seven enclosure revisions, each printed to test light leak, roller clearance, and component fit">
           <div class="frame"><img loading="lazy" src="images/leafdoc-revisions.webp" width="1044" height="420" alt="Seven 3D-printed enclosure revisions lined up on a workbench"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Seven printed revisions</figcaption>
@@ -894,7 +1030,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
         </div>
       </div>
 
-      <div class="gallery">
+      <div class="gallery stg">
         <figure class="shot" data-lb data-cap="The assembled FluroScan enclosure with the camera mounted above the sample chamber">
           <div class="frame"><img loading="lazy" src="images/fluroscan-device.webp" width="345" height="311" alt="Black 3D-printed FluroScan enclosure with a camera module on top"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Assembled enclosure</figcaption>
@@ -975,7 +1111,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
         </div>
       </div>
 
-      <div class="gallery">
+      <div class="gallery stg">
         <figure class="shot pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Transparent CAD render showing internal Raspberry Pi and electronics layout"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Redesign with internals housed</figcaption>
@@ -1129,7 +1265,12 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 
   /* ---------- nav border on scroll ---------- */
   var nav = document.getElementById("nav");
-  var onScroll = function () { nav.classList.toggle("stuck", window.scrollY > 12); };
+  var prog = document.getElementById("prog");
+  var onScroll = function () {
+    nav.classList.toggle("stuck", window.scrollY > 12);
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + "%";
+  };
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -1154,7 +1295,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   });
 
   /* ---------- reveal on scroll ---------- */
-  var reveals = Array.prototype.slice.call(document.querySelectorAll(".rv"));
+  var reveals = Array.prototype.slice.call(document.querySelectorAll(".rv, .stg"));
   function revealAll() { reveals.forEach(function (el) { el.classList.add("in"); }); }
 
   if (!("IntersectionObserver" in window)) {
@@ -1177,6 +1318,10 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     return { src: im.getAttribute("src"), alt: im.getAttribute("alt") || "", cap: f.getAttribute("data-cap") || "" };
   });
 
+  // keep the hero badge honest if the gallery ever changes size
+  var counter = document.getElementById("shotCount");
+  if (counter) counter.textContent = items.length;
+
   var lb    = document.getElementById("lb");
   var lbImg = document.getElementById("lbImg");
   var lbCap = document.getElementById("lbCap");
@@ -1190,6 +1335,9 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     lbImg.alt = it.alt;
     lbCap.textContent = it.cap;
     lbCnt.textContent = (idx + 1) + " / " + items.length;
+    lbImg.classList.remove("swap");
+    void lbImg.offsetWidth;          // force reflow so the animation replays
+    lbImg.classList.add("swap");
   }
 
   function open(i) {
