@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Charles Wang — Biological Engineering, Purdue</title>
-<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science — enclosure design, embedded electronics, and the software that turns a captured frame into a measurement.">
+<title>Charles Wang · Biological Engineering at Purdue</title>
+<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science at Purdue University. Three devices so far, each one designed, wired, and programmed from scratch.">
 <meta name="author" content="Charles Wang">
 <meta name="theme-color" content="#0e100f">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Charles Wang — Biological Engineering, Purdue">
-<meta property="og:description" content="Low-cost imaging instruments for plant science: hardware, electronics, and software.">
+<meta property="og:title" content="Charles Wang · Biological Engineering at Purdue">
+<meta property="og:description" content="Low-cost imaging instruments for plant science. Hardware, electronics, and software.">
 <meta property="og:url" content="https://charleswang435.github.io/">
 <meta property="og:image" content="https://charleswang435.github.io/images/leafdoc-device.webp">
 <meta name="twitter:card" content="summary_large_image">
@@ -471,11 +471,11 @@ figure.shot .frame img {
 }
 figure.shot:hover .frame img { transform: scale(1.05); }
 
-/* technical images that live on a white plate — show them whole */
+/* technical images that live on a white plate: show them whole */
 figure.shot.pad .frame { background: #fff; }
 figure.shot.pad .frame img { object-fit: contain; padding: 12px; }
 
-/* portrait phone screenshots — letterbox against the app's own dark UI */
+/* portrait phone screenshots: letterbox against the app's own dark UI */
 figure.shot.tall .frame { background: #101311; }
 figure.shot.tall .frame img { object-fit: contain; padding: 10px; }
 
@@ -505,26 +505,49 @@ figure.shot:hover .zoom-hint { opacity: 1; }
 /* ============================================================
    skills
    ============================================================ */
-.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 16px; }
-.skill {
-  padding: 26px 24px;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  background: var(--surface);
-  transition: border-color .22s, transform .22s, box-shadow .22s;
+.skillset { border-top: 1px solid var(--border); }
+
+.srow {
+  display: grid;
+  grid-template-columns: 208px 1fr;
+  gap: 28px;
+  padding: 26px 2px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
 }
-.skill:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-.skill .ic {
-  width: 36px; height: 36px;
+
+.srow h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.02rem;
+  font-weight: 620;
+  letter-spacing: -.014em;
+}
+
+.srow .ic {
+  width: 34px; height: 34px;
   border-radius: 9px;
   display: grid; place-items: center;
   background: var(--accent-bg);
   color: var(--accent);
-  margin-bottom: 15px;
+  flex: none;
 }
-.skill .ic svg { width: 18px; height: 18px; }
-.skill h3 { margin: 0 0 7px; font-size: 1rem; font-weight: 640; letter-spacing: -.012em; }
-.skill p { margin: 0; color: var(--muted); font-size: .89rem; line-height: 1.58; }
+.srow .ic svg { width: 17px; height: 17px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.chips li {
+  font-size: .87rem;
+  line-height: 1.3;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: color .18s, border-color .18s;
+}
+.chips li:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ============================================================
    contact
@@ -660,6 +683,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   .stat:nth-child(2n) { border-right: none; }
   .stat:nth-last-child(-n+2) { border-bottom: none; }
   .contact-card { padding: 42px 24px; }
+  .srow { grid-template-columns: 1fr; gap: 15px; padding: 22px 0; }
   .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 11px; }
   .lb { padding: 56px 12px 92px; }
   .lb-prev { left: 10px; } .lb-next { right: 10px; }
@@ -683,7 +707,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     <a class="brand" href="#top">Charles Wang<span>.</span></a>
     <div class="nav-links">
       <a href="#work">Work</a>
-      <a href="#skills">Capabilities</a>
+      <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
       <a href="Charles_Wang_Portfolio.pdf" target="_blank" rel="noopener">PDF</a>
     </div>
@@ -701,9 +725,9 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       <span class="mono eyebrow">Biological Engineering · Purdue</span>
       <h1>Charles&nbsp;Wang</h1>
       <p class="hero-sub">
-        I build <strong>low-cost imaging instruments</strong> for plant science —
-        the enclosure, the electronics, and the software that turns a captured
-        frame into a measurement.
+        I build <strong>low-cost imaging instruments</strong> for plant science.
+        Three of them so far, each one designed in CAD, wired by hand, and
+        programmed from scratch.
       </p>
       <div class="cta">
         <a class="btn solid" href="#work">
@@ -721,7 +745,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       </div>
     </div>
 
-    <figure class="hero-shot" data-lb data-cap="LeafDoc — the assembled lightbox with a smartphone locked in place above the sample">
+    <figure class="hero-shot" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
       <div class="frame">
         <img src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images">
       </div>
@@ -747,10 +771,10 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   <div class="wrap">
     <div class="sec-head narrow rv">
       <span class="mono">Selected Work</span>
-      <h2>Three instruments, built end to end</h2>
-      <p>Each of these started as a CAD sketch and ended as a working device in the
-         field — mechanical design, circuit assembly, and the software layer that
-         makes the data usable.</p>
+      <h2>Three instruments I designed and built</h2>
+      <p>Each one started as a CAD sketch and ended up working in the lab. I did
+         the mechanical design, the circuit assembly, and the software for all
+         three.</p>
     </div>
 
     <!-- ─────── 01 LeafDoc ─────── -->
@@ -765,34 +789,34 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           </ul>
         </div>
         <p class="p-lead">
-          A $50 handheld lightbox that clips onto a phone, blocks ambient light, and
-          delivers uniform LED illumination — turning any smartphone into a repeatable
-          leaf imaging rig.
+          A $50 handheld lightbox that clips onto a phone, blocks ambient light,
+          and lights the leaf evenly. It turns an ordinary smartphone into a
+          repeatable imaging rig.
         </p>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">The Problem</h4>
+          <h4 class="mono">Problem</h4>
           <ul>
             <li>Ambient light makes phone-captured leaf images inconsistent and hard to compare.</li>
-            <li>Hand-holding a leaf introduces curl, shadow, and framing variation on every shot.</li>
+            <li>Holding a leaf by hand introduces curl, shadow, and framing variation on every shot.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">What I Built</h4>
+          <h4 class="mono">What I built</h4>
           <ul>
-            <li><strong>Contoured rollers</strong> flatten and center the leaf on entry — repeatable positioning, no manual adjustment.</li>
+            <li><strong>Contoured rollers</strong> flatten and center the leaf as it enters, so the positioning repeats without any manual adjustment.</li>
             <li><strong>MagSafe mounting</strong> locks the phone in a fixed position above the sample.</li>
-            <li><strong>7 enclosure revisions</strong> in SolidWorks, each printed to test light leak, roller clearance, and component fit.</li>
-            <li><strong>Native Android app</strong> in Kotlin and CameraX with manual camera control and an alignment stitching algorithm.</li>
+            <li><strong>Seven enclosure revisions</strong> in SolidWorks, each one printed to test light leak, roller clearance, and component fit.</li>
+            <li>A <strong>native Android app</strong> in Kotlin and CameraX, with manual camera control and an alignment stitching algorithm.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Outcome</h4>
+          <h4 class="mono">Result</h4>
           <ul>
             <li>Overlapping frames assemble into a single full-length leaf image automatically.</li>
-            <li>Cloud AI returns a <strong>health score, primary finding, and confidence level</strong> in-app — no export, no external tools.</li>
+            <li>Cloud AI returns a <strong>health score, primary finding, and confidence level</strong> inside the app, with no export step or outside tools.</li>
           </ul>
         </div>
       </div>
@@ -802,7 +826,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           <div class="frame"><img loading="lazy" src="images/leafdoc-revisions.webp" width="1044" height="420" alt="Seven 3D-printed enclosure revisions lined up on a workbench"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Seven printed revisions</figcaption>
         </figure>
-        <figure class="shot pad" data-lb data-cap="SolidWorks model — contoured rollers guide and flatten the leaf as it enters the lightbox">
+        <figure class="shot pad" data-lb data-cap="SolidWorks model showing how the contoured rollers guide and flatten the leaf as it enters">
           <div class="frame"><img loading="lazy" src="images/leafdoc-cad.webp" width="722" height="352" alt="SolidWorks render of the LeafDoc lightbox with a leaf entering the rollers"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>CAD model &amp; roller geometry</figcaption>
         </figure>
@@ -810,17 +834,17 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           <div class="frame"><img loading="lazy" src="images/leafdoc-stitched.webp" width="585" height="152" alt="A stitched composite image of a full corn leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Stitched corn leaf output</figcaption>
         </figure>
-        <figure class="shot tall" data-lb data-cap="Capture view — manual camera controls with live segment tracking">
+        <figure class="shot tall" data-lb data-cap="Capture view, with manual camera controls and live segment tracking">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-capture.webp" width="274" height="608" alt="Android app capture screen showing a leaf and shutter button"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>App — capture</figcaption>
+          <figcaption>Capture screen</figcaption>
         </figure>
-        <figure class="shot tall" data-lb data-cap="Session management — captured frames, per-frame alignment editing, and capture metadata">
+        <figure class="shot tall" data-lb data-cap="Session management, with captured frames, per-frame alignment editing, and capture metadata">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-frames.webp" width="324" height="720" alt="Android app screen listing individual captured frames and session details"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>App — sessions &amp; alignment</figcaption>
+          <figcaption>Sessions and alignment</figcaption>
         </figure>
-        <figure class="shot tall" data-lb data-cap="AI diagnosis — health score, leaf description, primary finding, and confidence level delivered in-app">
+        <figure class="shot tall" data-lb data-cap="AI diagnosis, showing health score, leaf description, primary finding, and confidence level">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-ai.webp" width="432" height="960" alt="Android app screen showing an AI diagnosis with health score and recommendations"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>App — AI diagnosis</figcaption>
+          <figcaption>AI diagnosis screen</figcaption>
         </figure>
       </div>
     </article>
@@ -837,35 +861,35 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           </ul>
         </div>
         <p class="p-lead">
-          Direct, non-invasive measurement of photosynthetic efficiency via chlorophyll
-          fluorescence — detecting plant stress early, at a fraction of the cost of
-          commercial instrumentation.
+          Direct, non-invasive measurement of photosynthetic efficiency using
+          chlorophyll fluorescence. It catches plant stress early and costs far
+          less than a commercial instrument.
         </p>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">The Physics</h4>
+          <h4 class="mono">The physics</h4>
           <ul>
-            <li>Weak non-actinic light opens PSII reaction centers, giving baseline fluorescence <strong>F<sub>o</sub></strong>.</li>
-            <li>A saturating pulse closes all centers, giving maximum fluorescence <strong>F<sub>m</sub></strong>.</li>
+            <li>A weak, non-actinic light opens the PSII reaction centers and gives the baseline fluorescence, <strong>F<sub>o</sub></strong>.</li>
+            <li>A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
             <li>The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">The Build</h4>
+          <h4 class="mono">What I built</h4>
           <ul>
-            <li>Prototyped in SolidWorks, printed on Bambu Lab hardware.</li>
-            <li>Raspberry Pi drives the camera and system control.</li>
+            <li>Prototyped in SolidWorks and printed on Bambu Lab hardware.</li>
+            <li>A Raspberry Pi drives the camera and system control.</li>
             <li><strong>450 nm excitation</strong> at 4000 µmol m⁻²s⁻¹ from 12 LEDs in a 3-up configuration on an angled mount.</li>
             <li>Emission captured through a <strong>680/720 nm</strong> filter after dark adaptation.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Why It Matters</h4>
+          <h4 class="mono">Result</h4>
           <ul>
-            <li>Real-time imaging catches stress before it is visible to the eye.</li>
-            <li>Affordable and accessible enough to put this measurement in far more hands.</li>
+            <li>Real-time imaging catches stress before it shows up to the eye.</li>
+            <li>Cheap enough that a lab without a commercial fluorometer can still take the measurement.</li>
           </ul>
         </div>
       </div>
@@ -891,15 +915,15 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           <div class="frame"><img loading="lazy" src="images/fluroscan-holder.webp" width="327" height="280" alt="A leaf pressed flat under glass in the sample holder"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Sample holder</figcaption>
         </figure>
-        <figure class="shot pad" data-lb data-cap="Control sample — RGB image beside the corresponding fluorescence capture">
+        <figure class="shot pad" data-lb data-cap="Control sample, with the RGB image beside the corresponding fluorescence capture">
           <div class="frame"><img loading="lazy" src="images/fluroscan-control.webp" width="538" height="218" alt="Side by side RGB and fluorescence images of a control leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Control — RGB vs fluorescence</figcaption>
+          <figcaption>Control sample</figcaption>
         </figure>
-        <figure class="shot pad" data-lb data-cap="Test sample — RGB image beside the corresponding fluorescence capture">
+        <figure class="shot pad" data-lb data-cap="Test sample, with the RGB image beside the corresponding fluorescence capture">
           <div class="frame"><img loading="lazy" src="images/fluroscan-stressed.webp" width="422" height="166" alt="Side by side RGB and fluorescence images of a damaged leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Test sample — RGB vs fluorescence</figcaption>
+          <figcaption>Test sample</figcaption>
         </figure>
-        <figure class="shot pad" data-lb data-cap="PSII fluorescence emission spectra — the basis for the 680/720 nm filter selection">
+        <figure class="shot pad" data-lb data-cap="PSII fluorescence emission spectra, which set the choice of a 680/720 nm filter">
           <div class="frame"><img loading="lazy" src="images/fluroscan-spectra.webp" width="337" height="287" alt="Line chart of PSII fluorescence emission spectra by wavelength"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>PSII emission spectra</figcaption>
         </figure>
@@ -918,48 +942,49 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           </ul>
         </div>
         <p class="p-lead">
-          A phenotyping device capturing leaf detail at 0.04 mm/pixel across six
-          wavelength bands — redesigned so every electronic component lives inside
-          the enclosure.
+          A phenotyping device that captures leaf detail at 0.04 mm/pixel across
+          six wavelength bands. I redesigned it so that every component fits
+          inside the enclosure.
         </p>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">The Redesign</h4>
+          <h4 class="mono">Problem</h4>
           <ul>
-            <li>The original housed the Raspberry Pi externally, with wiring trailing out of the body.</li>
-            <li>I <strong>reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure to house all electronics internally — a genuinely field-portable instrument.</li>
+            <li>The original kept the Raspberry Pi in an external housing, with wiring running outside the body.</li>
+            <li>None of it was documented, so every subsystem had to be traced before anything could change.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">The Electronics</h4>
+          <h4 class="mono">What I built</h4>
           <ul>
+            <li><strong>Reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure so all the electronics sit inside it.</li>
             <li><strong>120+ LEDs</strong> hand-soldered across 6 wavelength bands.</li>
             <li>MOSFET transistor switching with 12V/5V power conversion.</li>
             <li>Raspberry Pi for camera control and capture sequencing.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Results</h4>
+          <h4 class="mono">Result</h4>
           <ul>
-            <li>High signal-to-noise ratio with ambient light fully blocked; <strong>secondary leaf veins clearly resolved</strong>.</li>
+            <li>A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
             <li>Detected plant stress <strong>days before visual symptoms</strong> appeared.</li>
-            <li>Enabled a co-researcher's ML model to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication — co-author.</li>
+            <li>Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication, which I am a co-author on.</li>
           </ul>
         </div>
       </div>
 
       <div class="gallery">
-        <figure class="shot pad" data-lb data-cap="Redesigned enclosure — a ghosted CAD view showing the Raspberry Pi and all electronics housed internally">
+        <figure class="shot pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Transparent CAD render showing internal Raspberry Pi and electronics layout"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Redesign — internals housed</figcaption>
+          <figcaption>Redesign with internals housed</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="The original device design, with the Raspberry Pi in an external housing and wiring running outside the body">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad.webp" width="361" height="380" alt="CAD render of the original handheld multispectral imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Original design (CAD)</figcaption>
         </figure>
-        <figure class="shot" data-lb data-cap="A leaf captured at 0.04 mm/pixel with ambient light fully blocked — secondary veins clearly resolved">
+        <figure class="shot" data-lb data-cap="A leaf captured at 0.04 mm/pixel with ambient light fully blocked, resolving the secondary veins">
           <div class="frame"><img loading="lazy" src="images/multispectral-capture.webp" width="405" height="251" alt="High resolution multispectral capture of a leaf against a bright background"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Capture at 0.04 mm/pixel</figcaption>
         </figure>
@@ -967,7 +992,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           <div class="frame"><img loading="lazy" src="images/multispectral-timeseries.webp" width="417" height="238" alt="Grid of false-colour leaf images across treatments and time points"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Treatment time series</figcaption>
         </figure>
-        <figure class="shot pad" data-lb data-cap="LeafSpec research poster — Institute for Digital Forestry, Purdue University">
+        <figure class="shot pad" data-lb data-cap="LeafSpec research poster from the Institute for Digital Forestry at Purdue University">
           <div class="frame"><img loading="lazy" src="images/multispectral-poster.webp" width="606" height="455" alt="Research poster describing the LeafSpec multispectral handheld imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Research poster</figcaption>
         </figure>
@@ -980,32 +1005,52 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 <section id="skills">
   <div class="wrap">
     <div class="sec-head narrow rv">
-      <span class="mono">Capabilities</span>
-      <h2>The full stack of a physical instrument</h2>
-      <p>Building these devices meant owning every layer — from the printed enclosure
-         to the diagnostic returned on screen.</p>
+      <span class="mono">Skills</span>
+      <h2>What I work with</h2>
+      <p>Everything here came out of building the three projects above.</p>
     </div>
-    <div class="skills rv">
-      <div class="skill">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></div>
-        <h3>Mechanical Design</h3>
-        <p>SolidWorks modelling, iterative 3D-printed prototyping on Bambu Lab hardware, enclosure and optical-path design.</p>
+    <div class="skillset rv">
+
+      <div class="srow">
+        <h3>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span>
+          Design &amp; Fabrication
+        </h3>
+        <ul class="chips">
+          <li>SolidWorks</li><li>3D Printing</li><li>Bambu Lab</li><li>Enclosure Design</li><li>Optical Path Layout</li>
+        </ul>
       </div>
-      <div class="skill">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.8-1.6l9.4-11.6a.5.5 0 0 1 .9.3V10h6a1 1 0 0 1 .8 1.6l-9.4 11.6a.5.5 0 0 1-.9-.3V14H4z"/></svg></div>
-        <h3>Electronics</h3>
-        <p>LED array design and hand soldering, MOSFET switching, 12V/5V power conversion, Raspberry Pi system control.</p>
+
+      <div class="srow">
+        <h3>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.8-1.6l9.4-11.6a.5.5 0 0 1 .9.3V10h6a1 1 0 0 1 .8 1.6l-9.4 11.6a.5.5 0 0 1-.9-.3V14H4z"/></svg></span>
+          Electronics
+        </h3>
+        <ul class="chips">
+          <li>LED Arrays</li><li>Hand Soldering</li><li>MOSFET Switching</li><li>12V/5V Power</li><li>Raspberry Pi</li>
+        </ul>
       </div>
-      <div class="skill">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        <h3>Software</h3>
-        <p>Native Android in Kotlin and CameraX, image stitching and alignment algorithms, multi-provider AI diagnostic pipelines.</p>
+
+      <div class="srow">
+        <h3>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+          Software
+        </h3>
+        <ul class="chips">
+          <li>Kotlin</li><li>Android</li><li>CameraX</li><li>Image Stitching</li><li>Cloud AI Integration</li>
+        </ul>
       </div>
-      <div class="skill">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></div>
-        <h3>Plant Science</h3>
-        <p>Phenotyping workflows, chlorophyll fluorescence and PSII measurement, multispectral imaging and stress detection.</p>
+
+      <div class="srow">
+        <h3>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
+          Plant Science
+        </h3>
+        <ul class="chips">
+          <li>Plant Phenotyping</li><li>Chlorophyll Fluorescence</li><li>Fv&#8239;/&#8239;Fm</li><li>Multispectral Imaging</li><li>Stress Detection</li>
+        </ul>
       </div>
+
     </div>
   </div>
 </section>
@@ -1014,9 +1059,9 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 <section id="contact">
   <div class="wrap">
     <div class="contact-card rv">
-      <h2>Let's build something</h2>
-      <p>I'm looking for roles and research at the intersection of hardware and
-         plant science. Email is the fastest way to reach me.</p>
+      <h2>Get in touch</h2>
+      <p>I'm looking for roles and research in hardware for plant science.
+         Email is the fastest way to reach me.</p>
       <div class="cta">
         <a class="btn solid" href="mailto:wangcharles362@gmail.com">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
@@ -1058,7 +1103,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next image">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
   </button>
-  <img id="lbImg" alt="">
+  <img id="lbImg" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <div class="lb-cap"><span id="lbCap"></span><span class="lb-count" id="lbCount"></span></div>
 </div>
 
