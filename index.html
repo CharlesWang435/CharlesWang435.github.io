@@ -454,7 +454,9 @@ h1 {
   line-height: 1.1;
   color: var(--accent);
 }
-.stat span { display: block; margin-top: 5px; color: var(--muted); font-size: .83rem; }
+/* direct child only: the counter span lives inside <b> and must keep its own size */
+.stat > span { display: block; margin-top: 5px; color: var(--muted); font-size: .83rem; }
+.stat b .num { font-variant-numeric: tabular-nums; }
 
 /* ============================================================
    sections
@@ -922,6 +924,53 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 .lb-next  { right: 18px; top: 42%; transform: translateY(-50%); }
 
 /* ============================================================
+   hero entrance (runs once on load)
+   ============================================================ */
+.js .intro > * {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: rise .85s var(--ease) forwards;
+}
+.js .intro > *:nth-child(1) { animation-delay: .05s }
+.js .intro > *:nth-child(2) { animation-delay: .13s }
+.js .intro > *:nth-child(3) { animation-delay: .21s }
+.js .intro > *:nth-child(4) { animation-delay: .29s }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+.js .hero-stack {
+  opacity: 0;
+  animation: shotIn 1s var(--ease) .22s forwards;
+}
+@keyframes shotIn {
+  from { opacity: 0; transform: translateY(26px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   3D tilt on gallery tiles
+   ============================================================ */
+.gallery { perspective: 900px; }
+figure.shot.tilt {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px) scale(1.01);
+  transition: transform .12s linear, box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+
+/* ============================================================
+   theme switch wipe (View Transitions API, ignored where absent)
+   ============================================================ */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2147483646; }
+html.vt-back::view-transition-old(root) { z-index: 2147483646; }
+html.vt-back::view-transition-new(root) { z-index: 1; }
+
+/* ============================================================
+   copy-to-clipboard feedback
+   ============================================================ */
+.btn.copied { border-color: var(--accent); color: var(--accent); }
+
+/* ============================================================
    reveal
    ============================================================ */
 .js .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease-out), transform .7s var(--ease-out); }
@@ -947,6 +996,8 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   html { scroll-behavior: auto; }
   .js .rv { opacity: 1; transform: none; transition: none; }
   .js .stg > figure { opacity: 1; transform: none; transition: none; }
+  .js .intro > *, .js .hero-stack { opacity: 1; transform: none; animation: none; }
+  figure.shot.tilt { transform: none; }
   /* the fan is decoration, so drop it entirely rather than snapping it */
   .peek { display: none; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -1015,7 +1066,7 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 <!-- ══════════════ hero ══════════════ -->
 <header class="hero" id="top">
   <div class="wrap hero-grid">
-    <div>
+    <div class="intro">
       <span class="mono eyebrow">Biological Engineering · Purdue</span>
       <h1>Charles&nbsp;Wang</h1>
       <p class="hero-sub">
@@ -1065,10 +1116,10 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 <!-- ══════════════ stats ══════════════ -->
 <div class="stats">
   <div class="wrap stats-in">
-    <div class="stat"><b>$50</b><span>Handheld build cost</span></div>
-    <div class="stat"><b>7</b><span>Enclosure revisions</span></div>
-    <div class="stat"><b>120+</b><span>LEDs hand-soldered</span></div>
-    <div class="stat"><b>0.04<small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per pixel resolution</span></div>
+    <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span>Handheld build cost</span></div>
+    <div class="stat"><b><span class="num" data-count="7">7</span></b><span>Enclosure revisions</span></div>
+    <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span>LEDs hand-soldered</span></div>
+    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per pixel resolution</span></div>
   </div>
 </div>
 
@@ -1487,6 +1538,10 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
           wangcharles362@gmail.com
         </a>
+        <button class="btn" id="copyMail" type="button" data-mail="wangcharles362@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy address</span>
+        </button>
         <a class="btn" href="Charles_Wang_Resume.pdf" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
           Résumé
@@ -1549,11 +1604,105 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   root.setAttribute("data-theme", saved || (prefersDark ? "dark" : "light"));
 
-  document.getElementById("themeBtn").addEventListener("click", function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.getElementById("themeBtn").addEventListener("click", function (ev) {
     var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("theme", next); } catch (e) {}
+    var apply = function () {
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) {}
+    };
+
+    // circular wipe out of the button, where the browser supports it
+    if (reduce || !document.startViewTransition) { apply(); return; }
+
+    var r = this.getBoundingClientRect();
+    var x = r.left + r.width / 2, y = r.top + r.height / 2;
+    var far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+
+    var t = document.startViewTransition(apply);
+    t.ready.then(function () {
+      root.animate(
+        { clipPath: ["circle(0px at " + x + "px " + y + "px)",
+                     "circle(" + far + "px at " + x + "px " + y + "px)"] },
+        { duration: 520, easing: "cubic-bezier(.22,.68,0,1)",
+          pseudoElement: "::view-transition-new(root)" }
+      );
+    }).catch(function () {});
   });
+
+  /* ---------- stat count-up ---------- */
+  var nums = Array.prototype.slice.call(document.querySelectorAll(".num[data-count]"));
+  function runCount(el) {
+    var target = parseFloat(el.getAttribute("data-count"));
+    var dec = parseInt(el.getAttribute("data-dec") || "0", 10);
+    var pre = el.getAttribute("data-prefix") || "";
+    var suf = el.getAttribute("data-suffix") || "";
+    if (reduce) { el.textContent = pre + target.toFixed(dec) + suf; return; }
+    var dur = 1400, start = null;
+    function frame(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 4);           // ease-out quart
+      el.textContent = pre + (target * eased).toFixed(dec) + suf;
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  if (nums.length) {
+    if (!("IntersectionObserver" in window)) {
+      nums.forEach(runCount);
+    } else {
+      var numObs = new IntersectionObserver(function (en, obs) {
+        en.forEach(function (e) {
+          if (e.isIntersecting) { runCount(e.target); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.6 });
+      nums.forEach(function (el) { numObs.observe(el); });
+    }
+  }
+
+  /* ---------- 3D tilt on gallery tiles ---------- */
+  if (!reduce && window.matchMedia && window.matchMedia("(hover: hover)").matches) {
+    Array.prototype.forEach.call(document.querySelectorAll("figure.shot"), function (fig) {
+      fig.addEventListener("mousemove", function (e) {
+        var b = fig.getBoundingClientRect();
+        var px = (e.clientX - b.left) / b.width - 0.5;
+        var py = (e.clientY - b.top) / b.height - 0.5;
+        fig.style.setProperty("--ry", (px * 7).toFixed(2) + "deg");
+        fig.style.setProperty("--rx", (-py * 7).toFixed(2) + "deg");
+        fig.classList.add("tilt");
+      });
+      fig.addEventListener("mouseleave", function () {
+        fig.classList.remove("tilt");
+        fig.style.removeProperty("--rx");
+        fig.style.removeProperty("--ry");
+      });
+    });
+  }
+
+  /* ---------- copy email ---------- */
+  var copyBtn = document.getElementById("copyMail");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var mail = copyBtn.getAttribute("data-mail");
+      var label = copyBtn.querySelector("span");
+      var done = function () {
+        var was = label.textContent;
+        label.textContent = "Copied";
+        copyBtn.classList.add("copied");
+        setTimeout(function () {
+          label.textContent = was;
+          copyBtn.classList.remove("copied");
+        }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(mail).then(done, function () { window.location.href = "mailto:" + mail; });
+      } else {
+        window.location.href = "mailto:" + mail;
+      }
+    });
+  }
 
   /* ---------- nav border on scroll ---------- */
   var nav = document.getElementById("nav");
@@ -1656,6 +1805,19 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
       t.setAttribute("aria-selected", on ? "true" : "false");
     });
     keepThumbInView(thumbs[idx]);
+    preloadNeighbours();
+  }
+
+  // warm the next and previous images so advancing is instant
+  var warmed = {};
+  function preloadNeighbours() {
+    [idx + 1, idx - 1].forEach(function (i) {
+      var j = (i + items.length) % items.length;
+      if (warmed[j]) return;
+      warmed[j] = true;
+      var im = new Image();
+      im.src = items[j].src;
+    });
   }
 
   // scroll the strip only, never the page behind it
@@ -1709,6 +1871,27 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     else if (e.key === "ArrowLeft") show(idx - 1);
     else if (e.key === "ArrowRight") show(idx + 1);
   });
+
+  /* ---------- swipe between images on touch ---------- */
+  (function () {
+    var x0 = 0, y0 = 0, tracking = false;
+    lbStage.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1) { tracking = false; return; }
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    lbStage.addEventListener("touchend", function (e) {
+      if (!tracking) return;
+      tracking = false;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - x0, dy = t.clientY - y0;
+      // horizontal intent only, so vertical scrolling is never hijacked
+      if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      show(dx < 0 ? idx + 1 : idx - 1);
+    }, { passive: true });
+  })();
 })();
 </script>
 
