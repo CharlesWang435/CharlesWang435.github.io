@@ -311,7 +311,10 @@ h1 {
    rather than a single image.                                          */
 .hero-stack { position: relative; }
 
+/* the fan position lives in custom properties so a card's own hover can
+   modify scale and rotation without restating its whole transform */
 .peek {
+  --tx: 0px; --ty: 0px; --rot: 1.6deg; --sc: 1;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -321,12 +324,23 @@ h1 {
   background: var(--surface);
   box-shadow: var(--shadow-md);
   opacity: 0;
-  transform: rotate(1.6deg);
-  transition: transform .6s var(--spring), opacity .4s var(--ease);
+  transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--sc));
+  transition: transform .6s var(--spring), opacity .4s var(--ease),
+              border-color .3s var(--ease), box-shadow .4s var(--ease);
   pointer-events: none;
   will-change: transform, opacity;
 }
 .peek img { width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+
+/* a thin scrim keeps the unselected cards reading as "behind" */
+.peek::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(8,10,9,.42);
+  transition: opacity .35s var(--ease);
+  pointer-events: none;
+}
 
 .hero-shot {
   margin: 0;
@@ -383,21 +397,26 @@ h1 {
 /* the fan needs both a pointer and room to fan into */
 @media (hover: hover) and (min-width: 1080px) {
   /* mostly downward travel: keeps the cards clear of the headline */
-  .hero-stack:hover .p1 {
-    opacity: 1;
-    transform: translate(-34px, 24px) rotate(-4deg) scale(.95);
-    transition-delay: .02s;
+  .hero-stack:hover .peek { pointer-events: auto; cursor: zoom-in; }
+  .hero-stack:hover .p1 { opacity: 1; --tx: -34px; --ty: 24px; --rot: -4deg;  --sc: .95; transition-delay: .02s; }
+  .hero-stack:hover .p2 { opacity: 1; --tx: -62px; --ty: 48px; --rot: -8deg;  --sc: .90; transition-delay: .07s; }
+  .hero-stack:hover .p3 { opacity: 1; --tx: -88px; --ty: 72px; --rot: -12deg; --sc: .85; transition-delay: .12s; }
+
+  /* hovering a single card selects it: it comes to the front, straightens,
+     drops its scrim and takes an accent ring */
+  .hero-stack .peek:hover {
+    z-index: 6;
+    --rot: -2deg;
+    --sc: 1.03;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transition-delay: 0s;
   }
-  .hero-stack:hover .p2 {
-    opacity: 1;
-    transform: translate(-62px, 48px) rotate(-8deg) scale(.9);
-    transition-delay: .07s;
-  }
-  .hero-stack:hover .p3 {
-    opacity: 1;
-    transform: translate(-88px, 72px) rotate(-12deg) scale(.85);
-    transition-delay: .12s;
-  }
+  .hero-stack .peek:hover::after { opacity: 0; }
+
+  /* while a card is selected, calm the main shot back down */
+  .hero-stack:has(.peek:hover) .hero-shot { transform: rotate(1.2deg) scale(1); }
+  .hero-stack:has(.peek:hover) .hero-shot .frame img { transform: none; }
 }
 .hero-shot figcaption {
   position: absolute;
@@ -707,38 +726,85 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   background: rgba(8,10,9,.94);
   backdrop-filter: blur(8px);
   display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 22px 96px;
+  flex-direction: column;
 }
 .lb.open { display: flex; animation: lbin .22s ease; }
 @keyframes lbin { from { opacity: 0 } to { opacity: 1 } }
 
-.lb img {
-  max-width: 100%;
-  max-height: 100%;
+/* main image area takes whatever height the strip and caption leave */
+.lb-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 62px 74px 10px;
+}
+/* fill the stage rather than sitting at native size: these sources are small,
+   so contain scales them up while preserving aspect. The cap keeps the
+   upscale modest on wide screens. */
+.lb-stage img {
+  width: 100%;
+  height: 100%;
+  max-width: 940px;
   object-fit: contain;
   border-radius: 8px;
-  background: #fff;
 }
 /* re-triggered on every advance so each image eases in */
-.lb img.swap { animation: lbswap .34s var(--ease); }
+.lb-stage img.swap { animation: lbswap .34s var(--ease); }
 @keyframes lbswap {
   from { opacity: 0; transform: scale(.965); }
   to   { opacity: 1; transform: none; }
 }
+
 .lb-cap {
-  position: absolute;
-  left: 50%; bottom: 34px;
-  transform: translateX(-50%);
+  flex: none;
   color: rgba(255,255,255,.82);
   font-size: .87rem;
   text-align: center;
-  max-width: 62ch;
-  padding: 0 20px;
+  padding: 12px 24px 6px;
   line-height: 1.5;
+  max-width: 70ch;
+  margin: 0 auto;
 }
-.lb-count { display: block; margin-top: 6px; color: rgba(255,255,255,.42); font-size: .76rem; }
+.lb-count { display: block; margin-top: 5px; color: rgba(255,255,255,.42); font-size: .76rem; }
+
+/* ---- filmstrip ---- */
+.lb-strip {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px 20px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+}
+.lb-strip::-webkit-scrollbar { height: 7px; }
+.lb-strip::-webkit-scrollbar-track { background: transparent; }
+.lb-strip::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 4px; }
+
+.thumb {
+  flex: none;
+  width: 78px; height: 58px;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #111;
+  cursor: pointer;
+  opacity: .45;
+  transition: opacity .25s var(--ease), border-color .25s var(--ease), transform .3s var(--spring);
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb:hover { opacity: .85; transform: translateY(-2px); }
+.thumb.on {
+  opacity: 1;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
 
 .lb-btn {
   position: absolute;
@@ -754,8 +820,9 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
 .lb-btn:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3); }
 .lb-btn svg { width: 19px; height: 19px; }
 .lb-close { top: 20px; right: 20px; }
-.lb-prev  { left: 20px;  top: 50%; transform: translateY(-50%); }
-.lb-next  { right: 20px; top: 50%; transform: translateY(-50%); }
+/* offset upward so the arrows centre on the image, not on image + strip */
+.lb-prev  { left: 18px;  top: 42%; transform: translateY(-50%); }
+.lb-next  { right: 18px; top: 42%; transform: translateY(-50%); }
 
 /* ============================================================
    reveal
@@ -810,8 +877,11 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   .contact-card { padding: 42px 24px; }
   .srow { grid-template-columns: 1fr; gap: 15px; padding: 22px 0; }
   .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 11px; }
-  .lb { padding: 56px 12px 92px; }
-  .lb-prev { left: 10px; } .lb-next { right: 10px; }
+  .lb-stage { padding: 58px 14px 8px; }
+  .lb-prev { left: 8px; } .lb-next { right: 8px; }
+  .lb-cap { font-size: .82rem; padding: 10px 16px 4px; }
+  .lb-strip { gap: 6px; padding: 10px 14px 14px; }
+  .thumb { width: 60px; height: 46px; }
 }
 
 @media (max-width: 430px) {
@@ -1239,8 +1309,11 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next image">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
   </button>
-  <img id="lbImg" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  <div class="lb-stage" id="lbStage">
+    <img id="lbImg" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  </div>
   <div class="lb-cap"><span id="lbCap"></span><span class="lb-count" id="lbCount"></span></div>
+  <div class="lb-strip" id="lbStrip" role="tablist" aria-label="All images"></div>
 </div>
 
 <script>
@@ -1322,11 +1395,30 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
   var counter = document.getElementById("shotCount");
   if (counter) counter.textContent = items.length;
 
-  var lb    = document.getElementById("lb");
-  var lbImg = document.getElementById("lbImg");
-  var lbCap = document.getElementById("lbCap");
-  var lbCnt = document.getElementById("lbCount");
+  var lb     = document.getElementById("lb");
+  var lbImg  = document.getElementById("lbImg");
+  var lbCap  = document.getElementById("lbCap");
+  var lbCnt  = document.getElementById("lbCount");
+  var lbStrip= document.getElementById("lbStrip");
+  var lbStage= document.getElementById("lbStage");
   var idx = 0;
+
+  // build the filmstrip once, from the same list the viewer walks
+  var thumbs = items.map(function (it, i) {
+    var b = document.createElement("button");
+    b.className = "thumb";
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-label", it.cap || it.alt || ("Image " + (i + 1)));
+    var im = document.createElement("img");
+    im.src = it.src;
+    im.alt = "";
+    im.loading = "lazy";
+    b.appendChild(im);
+    b.addEventListener("click", function (e) { e.stopPropagation(); show(i); });
+    lbStrip.appendChild(b);
+    return b;
+  });
 
   function show(i) {
     idx = (i + items.length) % items.length;
@@ -1338,6 +1430,22 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     lbImg.classList.remove("swap");
     void lbImg.offsetWidth;          // force reflow so the animation replays
     lbImg.classList.add("swap");
+
+    thumbs.forEach(function (t, n) {
+      var on = n === idx;
+      t.classList.toggle("on", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    keepThumbInView(thumbs[idx]);
+  }
+
+  // scroll the strip only, never the page behind it
+  function keepThumbInView(t) {
+    if (!t) return;
+    var sl = lbStrip.scrollLeft, w = lbStrip.clientWidth;
+    var left = t.offsetLeft, right = left + t.offsetWidth;
+    if (left < sl + 24) lbStrip.scrollLeft = Math.max(0, left - 24);
+    else if (right > sl + w - 24) lbStrip.scrollLeft = right - w + 24;
   }
 
   function open(i) {
@@ -1355,10 +1463,26 @@ footer p { margin: 0; color: var(--faint); font-size: .84rem; }
     f.addEventListener("click", function () { open(i); });
   });
 
+  // the fanned hero cards open their own image, not the hero's
+  Array.prototype.forEach.call(document.querySelectorAll(".peek"), function (pk) {
+    var im = pk.querySelector("img");
+    if (!im) return;
+    var src = im.getAttribute("src");
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].src === src) {
+        (function (target) {
+          pk.addEventListener("click", function (e) { e.stopPropagation(); open(target); });
+        })(i);
+        break;
+      }
+    }
+  });
+
   document.getElementById("lbClose").addEventListener("click", close);
   document.getElementById("lbPrev").addEventListener("click", function (e) { e.stopPropagation(); show(idx - 1); });
   document.getElementById("lbNext").addEventListener("click", function (e) { e.stopPropagation(); show(idx + 1); });
-  lb.addEventListener("click", function (e) { if (e.target === lb || e.target === lbImg) close(); });
+  // only the empty backdrop closes; clicking the photo or strip must not
+  lb.addEventListener("click", function (e) { if (e.target === lb || e.target === lbStage) close(); });
 
   document.addEventListener("keydown", function (e) {
     if (!lb.classList.contains("open")) return;
