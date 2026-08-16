@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Charles Wang · Biological Engineering at Purdue</title>
-<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science at Purdue University. Three devices so far, each one designed, wired, and programmed from scratch.">
+<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science at Purdue University. Four devices so far, each one designed, wired, and programmed from scratch.">
 <meta name="author" content="Charles Wang">
 <meta name="theme-color" content="#0e100f">
 
@@ -12,7 +12,7 @@
 <meta property="og:title" content="Charles Wang · Biological Engineering at Purdue">
 <meta property="og:description" content="Low-cost imaging instruments for plant science. Hardware, electronics, and software.">
 <meta property="og:url" content="https://charleswang435.github.io/">
-<meta property="og:image" content="https://charleswang435.github.io/images/leafdoc-device.webp">
+<meta property="og:image" content="https://charleswang435.github.io/images/microscope-hero.webp">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
@@ -305,16 +305,16 @@ h1 {
 }
 .btn.solid:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
 
-/* ---- hero photo stack -------------------------------------------------
-   At rest the peek cards sit exactly behind the main shot. On hover they
-   waterfall out to the left on a stagger, so it reads as a deck of photos
-   rather than a single image.                                          */
+/* ---- hero device deck -------------------------------------------------
+   The cross-section imager sits on top; the other three devices peek
+   out behind it as a spread deck. Hovering the stack fans them out,
+   and hovering a single card brings it forward.                      */
 .hero-stack { position: relative; }
 
-/* the fan position lives in custom properties so a card's own hover can
-   modify scale and rotation without restating its whole transform */
+/* the deck position lives in custom properties so a card's own hover
+   can modify scale and rotation without restating its transform */
 .peek {
-  --tx: 0px; --ty: 0px; --rot: 1.6deg; --sc: 1;
+  --tx: 0px; --ty: 0px; --rot: 0deg; --sc: 1;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -323,23 +323,46 @@ h1 {
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-md);
-  opacity: 0;
   transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--sc));
-  transition: transform .6s var(--spring), opacity .4s var(--ease),
-              border-color .3s var(--ease), box-shadow .4s var(--ease);
+  transition: transform .6s var(--spring), border-color .3s var(--ease), box-shadow .4s var(--ease);
   pointer-events: none;
-  will-change: transform, opacity;
+  will-change: transform;
 }
-.peek img { width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+.peek img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
-/* a thin scrim keeps the unselected cards reading as "behind" */
+/* resting spread: each card peeks a little further out, down-left */
+.p1 { --tx: -14px; --ty: 10px; --rot: -4deg; }
+.p2 { --tx: -26px; --ty: 21px; --rot: -8deg; }
+.p3 { --tx: -38px; --ty: 32px; --rot: -12deg; }
+
+/* a thin scrim keeps the deck reading as "behind" until it fans */
 .peek::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(8,10,9,.42);
+  background: rgba(8,10,9,.5);
   transition: opacity .35s var(--ease);
   pointer-events: none;
+}
+
+/* device name, revealed once the deck fans */
+.peek-tag {
+  position: absolute;
+  left: 10px; bottom: 10px;
+  z-index: 2;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(12,14,13,.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 550;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .35s var(--ease), transform .45s var(--spring);
 }
 
 .hero-shot {
@@ -360,64 +383,6 @@ h1 {
   object-fit: cover;
   transition: transform .7s var(--ease);
 }
-
-/* photo counter, always visible so the affordance survives on touch */
-.hero-shot .count {
-  position: absolute;
-  top: 12px; left: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 11px 5px 9px;
-  border-radius: 999px;
-  background: rgba(12,14,13,.62);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
-  color: #fff;
-  font-size: .74rem;
-  letter-spacing: .01em;
-  opacity: .82;
-  transition: opacity .3s var(--ease), transform .45s var(--spring);
-}
-.hero-shot .count svg { width: 13px; height: 13px; }
-.hero-shot .count b { font-weight: 650; }
-
-/* the lift applies on any hover-capable device */
-@media (hover: hover) {
-  .hero-stack:hover .hero-shot { transform: rotate(0deg) scale(1.02); }
-  .hero-stack:hover .hero-shot .frame img { transform: scale(1.04); }
-  .hero-stack:hover .hero-shot .count { opacity: 1; transform: translateY(-1px); }
-}
-
-/* below this the cards would reach the headline, so never render or fetch them */
-@media (max-width: 1079px) {
-  .peek { display: none; }
-}
-
-/* the fan needs both a pointer and room to fan into */
-@media (hover: hover) and (min-width: 1080px) {
-  /* mostly downward travel: keeps the cards clear of the headline */
-  .hero-stack:hover .peek { pointer-events: auto; cursor: zoom-in; }
-  .hero-stack:hover .p1 { opacity: 1; --tx: -34px; --ty: 24px; --rot: -4deg;  --sc: .95; transition-delay: .02s; }
-  .hero-stack:hover .p2 { opacity: 1; --tx: -62px; --ty: 48px; --rot: -8deg;  --sc: .90; transition-delay: .07s; }
-  .hero-stack:hover .p3 { opacity: 1; --tx: -88px; --ty: 72px; --rot: -12deg; --sc: .85; transition-delay: .12s; }
-
-  /* hovering a single card selects it: it comes to the front, straightens,
-     drops its scrim and takes an accent ring */
-  .hero-stack .peek:hover {
-    z-index: 6;
-    --rot: -2deg;
-    --sc: 1.03;
-    border-color: var(--accent);
-    box-shadow: var(--shadow-lg);
-    transition-delay: 0s;
-  }
-  .hero-stack .peek:hover::after { opacity: 0; }
-
-  /* while a card is selected, calm the main shot back down */
-  .hero-stack:has(.peek:hover) .hero-shot { transform: rotate(1.2deg) scale(1); }
-  .hero-stack:has(.peek:hover) .hero-shot .frame img { transform: none; }
-}
 .hero-shot figcaption {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -428,15 +393,85 @@ h1 {
   line-height: 1.4;
 }
 
+/* the lift applies on any hover-capable device */
+@media (hover: hover) {
+  .hero-stack:hover .hero-shot { transform: rotate(0deg) scale(1.02); }
+  .hero-stack:hover .hero-shot .frame img { transform: scale(1.04); }
+}
+
+/* the full fan needs both a pointer and room to fan into */
+@media (hover: hover) and (min-width: 1080px) {
+  /* mostly downward travel: keeps the cards clear of the headline */
+  .hero-stack:hover .peek { pointer-events: auto; cursor: zoom-in; }
+  .hero-stack:hover .peek::after { opacity: .16; }
+  .hero-stack:hover .peek-tag { opacity: 1; transform: none; }
+  .hero-stack:hover .p1 { --tx: -44px;  --ty: 30px; --rot: -7deg;  --sc: .97; transition-delay: .02s; }
+  .hero-stack:hover .p2 { --tx: -84px;  --ty: 62px; --rot: -13deg; --sc: .93; transition-delay: .07s; }
+  .hero-stack:hover .p3 { --tx: -122px; --ty: 96px; --rot: -19deg; --sc: .89; transition-delay: .12s; }
+
+  /* hovering a single card selects it: it comes to the front, straightens,
+     drops its scrim and takes an accent ring */
+  .hero-stack .peek:hover {
+    z-index: 6;
+    --rot: -2deg;
+    --sc: 1.02;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transition-delay: 0s;
+  }
+  .hero-stack .peek:hover::after { opacity: 0; }
+
+  /* while a card is selected, calm the main shot back down */
+  .hero-stack:has(.peek:hover) .hero-shot { transform: rotate(1.2deg) scale(1); }
+  .hero-stack:has(.peek:hover) .hero-shot .frame img { transform: none; }
+}
+
+/* ============================================================
+   cross-section scan band
+   ============================================================ */
+/* one full stitched specimen drifting past, the way the rail
+   steps the leaf under the objective. Dark in both themes,
+   because the strips are dark-field captures. */
+.scanband {
+  margin: 6px 0 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #0b0d0c;
+  overflow: hidden;
+  padding: 20px 0 12px;
+}
+.scan-track {
+  display: flex;
+  width: max-content;
+  animation: scan 75s linear infinite;
+}
+.scan-track img {
+  height: 64px;
+  width: auto;
+  max-width: none;
+  margin-right: 90px;
+}
+.scanband:hover .scan-track { animation-play-state: paused; }
+/* the track is two identical copies, so -50% lands exactly on the seam */
+@keyframes scan { to { transform: translateX(-50%); } }
+.scan-label {
+  margin: 14px 0 0;
+  text-align: center;
+  color: #6d746b;
+  font-size: .68rem;
+}
+
 /* ============================================================
    stat strip
    ============================================================ */
 .stats {
+  position: relative;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background: var(--bg-alt);
 }
 .stats-in {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
@@ -456,6 +491,15 @@ h1 {
 }
 /* direct child only: the counter span lives inside <b> and must keep its own size */
 .stat > span { display: block; margin-top: 5px; color: var(--muted); font-size: .83rem; }
+.stat .stat-dev {
+  display: block;
+  margin-top: 4px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .6rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
 .stat b .num { font-variant-numeric: tabular-nums; }
 
 /* ============================================================
@@ -555,6 +599,133 @@ html[data-theme="dark"] .tags li { border-color: var(--border); }
 }
 .details li strong { color: var(--text); font-weight: 600; }
 
+/* main device view, on the right of each project header */
+.p-vis {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  cursor: zoom-in;
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.p-vis:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.p-vis .frame {
+  position: relative;
+  aspect-ratio: 4/5;
+  background: var(--frame-bg);
+  overflow: hidden;
+}
+.p-vis .frame img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s var(--ease-out);
+}
+.p-vis:hover .frame img { transform: scale(1.04); }
+.p-vis:hover .zoom-hint { opacity: 1; }
+.p-vis.pad .frame { background: #fff; }
+.p-vis.pad .frame img { object-fit: contain; padding: 16px; }
+.p-vis figcaption {
+  padding: 10px 13px;
+  font-size: .78rem;
+  line-height: 1.45;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+.p-head .p-lead { margin-top: 16px; }
+
+/* ============================================================
+   nitrogen strip comparison
+   ============================================================ */
+/* two full-length cross-section strips on synchronised scroll,
+   so the same position along the leaf can be compared across
+   nitrogen treatments */
+.strip-compare {
+  margin: 0 0 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #0b0d0c;
+  padding: 20px 20px 6px;
+  overflow: hidden;
+}
+.strip-row + .strip-row { margin-top: 16px; }
+.strip-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.strip-meta .mono { color: #9fe0b4; font-size: .68rem; }
+.strip-meta span:last-child { color: #6d746b; font-size: .74rem; }
+.strip-scroll {
+  overflow-x: auto;
+  border-radius: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+.strip-scroll::-webkit-scrollbar { height: 7px; }
+.strip-scroll::-webkit-scrollbar-track { background: transparent; }
+.strip-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 4px; }
+.strip-scroll img {
+  height: 78px;
+  width: auto;
+  max-width: none;
+  display: block;
+}
+/* shared position slider: pans both strips at once, edge to midrib */
+.strip-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 0 2px;
+}
+.strip-slider .mono { color: #6d746b; font-size: .64rem; flex: none; }
+.strip-slider input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  margin: 0;
+  border-radius: 2px;
+  background: rgba(255,255,255,.16);
+  cursor: ew-resize;
+}
+.strip-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #9fe0b4;
+  border: 3px solid #0b0d0c;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.28);
+  cursor: ew-resize;
+  transition: transform .18s var(--ease);
+}
+.strip-slider input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+.strip-slider input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.16);
+}
+.strip-slider input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #9fe0b4;
+  border: 3px solid #0b0d0c;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.28);
+  cursor: ew-resize;
+}
+
+.strip-hint {
+  margin: 12px 0 0;
+  padding-bottom: 8px;
+  text-align: center;
+  color: #6d746b;
+  font-size: .68rem;
+}
+
 /* ============================================================
    gallery
    ============================================================ */
@@ -596,9 +767,11 @@ figure.shot:hover .frame img { transform: scale(1.05); }
 figure.shot.pad .frame { background: #fff; }
 figure.shot.pad .frame img { object-fit: contain; padding: 12px; }
 
-/* portrait phone screenshots: letterbox against the app's own dark UI */
-figure.shot.tall .frame { background: #101311; }
-figure.shot.tall .frame img { object-fit: contain; padding: 10px; }
+/* portrait phone screenshots and wide dark-field composites: letterbox on dark */
+figure.shot.tall .frame,
+figure.shot.dark .frame { background: #101311; }
+figure.shot.tall .frame img,
+figure.shot.dark .frame img { object-fit: contain; padding: 10px; }
 
 figure.shot figcaption {
   padding: 11px 13px 13px;
@@ -778,8 +951,20 @@ figure.shot:hover .zoom-hint { opacity: 1; }
   text-align: center;
   box-shadow: var(--shadow-md);
   position: relative;
+  isolation: isolate;
   overflow: hidden;
 }
+/* leaf-strip wallpaper, behind the content but above the card surface */
+.contact-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("images/microscope-sections-nitrogen.webp") center/cover no-repeat;
+  opacity: .06;
+  pointer-events: none;
+}
+html[data-theme="dark"] .contact-card::after { opacity: .14; }
 .contact-card::before {
   content: "";
   position: absolute;
@@ -991,6 +1176,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
 .stg > figure:nth-child(6) { transition-delay: .30s }
 .stg > figure:nth-child(7) { transition-delay: .36s }
 .stg > figure:nth-child(8) { transition-delay: .42s }
+.stg > figure:nth-child(9) { transition-delay: .48s }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -998,8 +1184,10 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   .js .stg > figure { opacity: 1; transform: none; transition: none; }
   .js .intro > *, .js .hero-stack { opacity: 1; transform: none; animation: none; }
   figure.shot.tilt { transform: none; }
-  /* the fan is decoration, so drop it entirely rather than snapping it */
-  .peek { display: none; }
+  /* stop the drift; show one copy and let it scroll by hand instead */
+  .scan-track { animation: none; }
+  .scan-track img + img { display: none; }
+  .scanband { overflow-x: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
@@ -1008,7 +1196,9 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
    ============================================================ */
 @media (max-width: 940px) {
   .hero-grid { grid-template-columns: 1fr; gap: 46px; }
-  .hero-shot { max-width: 330px; transform: none; }
+  .hero-stack { max-width: 330px; }
+  .hero-shot { transform: none; }
+  .p-vis .frame { aspect-ratio: 16/10; }
   .hero-sub { max-width: 46ch; }
   .p-head { grid-template-columns: 1fr; gap: 22px; }
 }
@@ -1030,6 +1220,10 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   .lb-cap { font-size: .82rem; padding: 10px 16px 4px; }
   .lb-strip { gap: 6px; padding: 10px 14px 14px; }
   .thumb { width: 60px; height: 46px; }
+  .scanband { padding: 16px 0 10px; }
+  .scan-track img { height: 46px; margin-right: 60px; }
+  .strip-compare { padding: 14px 14px 4px; }
+  .strip-scroll img { height: 62px; }
 }
 
 @media (max-width: 430px) {
@@ -1052,7 +1246,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       <a href="#work">Work</a>
       <a href="#experience">Experience</a>
       <a href="#skills">Skills</a>
-      <a href="Charles_Wang_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+      <a href="CharlesWangResume2026.pdf" target="_blank" rel="noopener">Résumé</a>
       <a href="#contact">Contact</a>
     </div>
     <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">
@@ -1079,7 +1273,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <svg class="nudge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
           View the work
         </a>
-        <a class="btn" href="Charles_Wang_Resume.pdf" target="_blank" rel="noopener">
+        <a class="btn" href="CharlesWangResume2026.pdf" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
           Résumé
         </a>
@@ -1095,19 +1289,16 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     </div>
 
     <div class="hero-stack">
-      <!-- decorative peek cards: they fan out on hover to show more exists -->
-      <span class="peek p3" aria-hidden="true"><img src="images/leafdoc-app-ai.webp" alt="" loading="lazy"></span>
-      <span class="peek p2" aria-hidden="true"><img src="images/leafdoc-app-frames.webp" alt="" loading="lazy"></span>
-      <span class="peek p1" aria-hidden="true"><img src="images/leafdoc-revisions.webp" alt="" loading="lazy"></span>
+      <!-- the other three devices sit behind as a spread deck; hovering fans them out -->
+      <span class="peek p3" aria-hidden="true"><img src="images/multispectral-cad-internal.webp" alt="" loading="lazy"><span class="peek-tag">Multispectral Imager</span></span>
+      <span class="peek p2" aria-hidden="true"><img src="images/fluoroscan-device.webp" alt="" loading="lazy"><span class="peek-tag">FluoroScan</span></span>
+      <span class="peek p1" aria-hidden="true"><img src="images/leafdoc-device.webp" alt="" loading="lazy"><span class="peek-tag">LeafDoc</span></span>
 
-      <figure class="hero-shot" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
+      <figure class="hero-shot" data-lb data-cap="Prototype 1 of the cross-section imager: the motorised clamp, rail and focusing drive built onto the lab's handheld leaf microscope">
         <div class="frame">
-          <img src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images">
-          <span class="count">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>
-            <b id="shotCount">20</b>&nbsp;photos</span>
+          <img src="images/microscope-hero.webp" width="900" height="1200" alt="The cross-section microscope imager: a handheld leaf microscope fitted with the motorised cross-section attachment">
         </div>
-        <figcaption>LeafDoc · $50 handheld imaging attachment</figcaption>
+        <figcaption>Cross-Section Imager &middot; the latest of four builds</figcaption>
       </figure>
     </div>
   </div>
@@ -1116,10 +1307,10 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
 <!-- ══════════════ stats ══════════════ -->
 <div class="stats">
   <div class="wrap stats-in">
-    <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span>Handheld build cost</span></div>
-    <div class="stat"><b><span class="num" data-count="7">7</span></b><span>Enclosure revisions</span></div>
-    <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span>LEDs hand-soldered</span></div>
-    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per pixel resolution</span></div>
+    <div class="stat"><b><span class="num" data-count="200" data-suffix="&times;">200&times;</span></b><span>Capture magnification<span class="stat-dev">Cross-Section Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span>Lightbox build cost<span class="stat-dev">LeafDoc</span></span></div>
+    <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span>LEDs hand-soldered<span class="stat-dev">Multispectral Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per pixel resolution<span class="stat-dev">Multispectral Imager</span></span></div>
   </div>
 </div>
 
@@ -1136,22 +1327,145 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
          four.</p>
     </div>
 
-    <!-- ─────── 01 LeafDoc ─────── -->
+    <!-- ─────── 01 Microscope Imager ─────── -->
+    <article class="project rv" id="microscope">
+      <div class="p-head">
+        <div>
+          <span class="mono p-num">Project 01 <b class="wip">In progress</b></span>
+          <h3>Leaf Cross-Section Microscope Imager</h3>
+          <p class="p-tagline">M.S. project, Purdue Plant Sensor Lab &middot; Jan 2026 to present</p>
+          <p class="p-lead">
+            A modular attachment for the lab's handheld 400&times; leaf microscope that
+            images a full corn-leaf cross section, so nitrogen status can be read
+            from the leaf's internal structure.
+          </p>
+          <ul class="tags">
+            <li>Optics</li><li>Liquid Lens</li><li>Rack &amp; Pinion</li><li>Motor Control</li><li>Web Console</li><li>SolidWorks</li>
+          </ul>
+        </div>
+        <figure class="p-vis" data-lb data-cap="The first prototype assembled on the handheld microscope, with the focusing drive, linear actuator and control electronics">
+          <div class="frame"><img loading="lazy" src="images/microscope-p1-device.webp" width="1600" height="1067" alt="Side view of the full first prototype cross-section attachment on the handheld LeafSpec microscope"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Prototype 1, assembled</figcaption>
+        </figure>
+      </div>
+
+      <!-- the full stitched specimen, drifting past like the rail feed -->
+      <div class="scanband" role="img" aria-label="A full stitched microscope cross section of a corn leaf, drifting past edge to midrib">
+        <div class="scan-track">
+          <img src="images/microscope-strip-full.webp" width="2970" height="82" alt="" loading="lazy">
+          <img src="images/microscope-strip-full.webp" width="2970" height="82" alt="" loading="lazy" aria-hidden="true">
+        </div>
+        <p class="scan-label mono">One corn leaf, edge &rarr; midrib &middot; ~40 frames stitched &middot; captured by prototype 1</p>
+      </div>
+
+      <div class="details">
+        <div>
+          <h4 class="mono">Problem</h4>
+          <ul>
+            <li>The microscope sees one spot at a time, and its autofocus hunts for peak sharpness by stepping the leaf platform down a threaded-rod stage, taking <strong>about a minute per frame</strong>.</li>
+            <li>Play in the platform's guide rods tilts each shot slightly. That is negligible on a leaf surface, but enough to push a thin cross section out of the frame entirely.</li>
+            <li>Autofocus scores sharpness at the centre of the view, and a cut corn leaf is rarely centred, so it often locked onto the empty stage instead of the leaf.</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="mono">Prototype 1 &middot; built</h4>
+          <ul>
+            <li>A <strong>3D-printed clamp on a motorised linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
+            <li>A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) added live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
+            <li><strong>21 corn-leaf cross sections</strong> captured edge to midrib, each stitched from around 40 frames in a companion desktop app.</li>
+            <li>The catch: focusing every frame by hand took roughly 20 seconds each, so one leaf took <strong>over 13 minutes</strong>.</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="mono">Prototype 2 &middot; in progress</h4>
+          <ul>
+            <li>An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt stops mattering.</li>
+            <li>The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-centre linear actuator whose weight caused the tilt and lighting drift.</li>
+            <li>Target: a full cross-section scan in <strong>under 1 minute per leaf</strong>, down from 13.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strip-compare">
+        <div class="strip-row">
+          <div class="strip-meta">
+            <span class="mono">100% nitrogen</span>
+            <span>Tall_TC_113 &middot; edge to midrib</span>
+          </div>
+          <div class="strip-scroll"><img src="images/microscope-strip-100n.webp" width="2820" height="52" alt="Stitched microscope cross section of a corn leaf grown at the full nitrogen rate" loading="lazy"></div>
+        </div>
+        <div class="strip-row">
+          <div class="strip-meta">
+            <span class="mono">0% nitrogen</span>
+            <span>Tall_TC_112 &middot; edge to midrib</span>
+          </div>
+          <div class="strip-scroll"><img src="images/microscope-strip-0n.webp" width="2805" height="48" alt="Stitched microscope cross section of a corn leaf grown with no nitrogen fertiliser" loading="lazy"></div>
+        </div>
+        <div class="strip-slider">
+          <span class="mono">Edge</span>
+          <input type="range" id="stripRange" min="0" max="1000" value="0" aria-label="Pan both strips along the leaf, from edge to midrib">
+          <span class="mono">Midrib</span>
+        </div>
+        <p class="strip-hint mono">Drag the slider to travel both leaves at once, the way the rail walks them under the lens</p>
+      </div>
+
+      <div class="gallery stg">
+        <figure class="shot dark" data-lb data-cap="The lab's original handheld leaf microscope, built by a previous lab member. The cross-section attachment builds on this platform.">
+          <div class="frame"><img loading="lazy" src="images/microscope-original-device.webp" width="348" height="280" alt="Labelled photo of the original handheld leaf microscope showing the optical system, focusing mechanism, leaf clamp and embedded control unit"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>The original microscope</figcaption>
+        </figure>
+        <figure class="shot pad" data-lb data-cap="Cutaway of the original optical path, from the LED source through the objective up to the camera sensor">
+          <div class="frame"><img loading="lazy" src="images/microscope-original-optics.webp" width="918" height="555" alt="CAD cutaway of the handheld microscope showing the illumination and imaging path through the objective to the camera"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Original optical path</figcaption>
+        </figure>
+        <figure class="shot pad" data-lb data-cap="The original focusing drive: one servo spins two threaded rods through bevel gears to raise the leaf platform. The play in this stage is what made cross-section autofocus unusable.">
+          <div class="frame"><img loading="lazy" src="images/microscope-focus-gears.webp" width="356" height="220" alt="CAD render of the focusing mechanism with a servo motor driving two threaded rods through bevel gears"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Original focusing drive</figcaption>
+        </figure>
+        <figure class="shot" data-lb data-cap="Prototype 1: the cross-section clamp rides a linear rail beneath the objective, stepping the cut leaf sideways 0.75 mm per frame">
+          <div class="frame"><img loading="lazy" src="images/microscope-p1-front.webp" width="1600" height="1067" alt="Close-up of the first prototype with the objective lens above the black cross-section clamp and linear rail"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Prototype 1 clamp and rail</figcaption>
+        </figure>
+        <figure class="shot" data-lb data-cap="The rail's motor hangs off one side and needs its own external driver. That imbalance tilted the stage and let stray light into the frames.">
+          <div class="frame"><img loading="lazy" src="images/microscope-p1-back.webp" width="1600" height="1067" alt="Back view of the first prototype showing the side-mounted motor, external driver box and wiring"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Prototype 1 from the back</figcaption>
+        </figure>
+        <figure class="shot dark" data-lb data-cap="21 corn-leaf cross sections captured with prototype 1, each stitched from around 40 frames, arranged by field replicate. Every strip runs edge to midrib.">
+          <div class="frame"><img loading="lazy" src="images/microscope-sections-replicates.webp" width="2200" height="1216" alt="Composite of 21 stitched corn leaf cross-section strips arranged in three replicate groups"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>21 stitched cross sections</figcaption>
+        </figure>
+        <figure class="shot dark" data-lb data-cap="The same strips grouped by nitrogen treatment, from 0% up to 133%. The structural differences across treatments are what the imaging is after.">
+          <div class="frame"><img loading="lazy" src="images/microscope-sections-nitrogen.webp" width="2200" height="1216" alt="Composite of stitched cross-section strips ordered by nitrogen treatment from low to high"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Grouped by nitrogen rate</figcaption>
+        </figure>
+        <figure class="shot" data-lb data-cap="Prototype 2 in progress: the liquid lens is fitted into the optical path, and the rack-and-pinion parts for the new horizontal stage are laid out below">
+          <div class="frame"><img loading="lazy" src="images/microscope-p2-liquid-lens.webp" width="1600" height="1067" alt="Disassembled second prototype on a cutting mat with the liquid lens annotated and rack and pinion parts laid out"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Prototype 2 &middot; liquid lens</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <!-- ─────── 02 LeafDoc ─────── -->
     <article class="project rv">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 01</span>
+          <span class="mono p-num">Project 02</span>
           <h3>LeafDoc</h3>
           <p class="p-tagline">Smartphone plant imaging system with AI-powered diagnosis</p>
+          <p class="p-lead">
+            A $50 handheld lightbox that blocks ambient light and lights the leaf
+            evenly. A phone snaps onto the top surface, ready to image through
+            the LeafDoc app &mdash; turning an ordinary smartphone into a
+            repeatable imaging rig.
+          </p>
           <ul class="tags">
             <li>SolidWorks</li><li>Kotlin</li><li>CameraX</li><li>Image Stitching</li><li>3D Printing</li>
           </ul>
         </div>
-        <p class="p-lead">
-          A $50 handheld lightbox that clips onto a phone, blocks ambient light,
-          and lights the leaf evenly. It turns an ordinary smartphone into a
-          repeatable imaging rig.
-        </p>
+        <figure class="p-vis" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
+          <div class="frame"><img loading="lazy" src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>The assembled device</figcaption>
+        </figure>
       </div>
 
       <div class="details">
@@ -1208,22 +1522,26 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       </div>
     </article>
 
-    <!-- ─────── 02 FluoroScan ─────── -->
+    <!-- ─────── 03 FluoroScan ─────── -->
     <article class="project rv">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 02</span>
+          <span class="mono p-num">Project 03</span>
           <h3>FluoroScan</h3>
           <p class="p-tagline">Portable photosynthetic efficiency imaging system</p>
+          <p class="p-lead">
+            A low-cost imager built to measure photosynthetic efficiency directly
+            and non-invasively through chlorophyll fluorescence, so plant stress
+            could be caught before it is visible.
+          </p>
           <ul class="tags">
             <li>Raspberry Pi</li><li>SolidWorks</li><li>Optics</li><li>LED Arrays</li><li>Fluorescence</li>
           </ul>
         </div>
-        <p class="p-lead">
-          Direct, non-invasive measurement of photosynthetic efficiency using
-          chlorophyll fluorescence. It catches plant stress early and costs far
-          less than a commercial instrument.
-        </p>
+        <figure class="p-vis" data-lb data-cap="The assembled FluoroScan enclosure with the camera mounted above the sample chamber">
+          <div class="frame"><img loading="lazy" src="images/fluoroscan-device.webp" width="345" height="311" alt="Black 3D-printed FluoroScan enclosure with a camera module on top"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Assembled enclosure</figcaption>
+        </figure>
       </div>
 
       <div class="details">
@@ -1245,19 +1563,15 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           </ul>
         </div>
         <div>
-          <h4 class="mono">Result</h4>
+          <h4 class="mono">The goal</h4>
           <ul>
-            <li>Real-time imaging catches stress before it shows up to the eye.</li>
-            <li>Cheap enough that a lab without a commercial fluorometer can still take the measurement.</li>
+            <li>Real-time imaging that flags stress before it shows up to the eye.</li>
+            <li>A build cost low enough that a lab without a commercial fluorometer can still take the measurement.</li>
           </ul>
         </div>
       </div>
 
       <div class="gallery stg">
-        <figure class="shot" data-lb data-cap="The assembled FluoroScan enclosure with the camera mounted above the sample chamber">
-          <div class="frame"><img loading="lazy" src="images/fluoroscan-device.webp" width="345" height="311" alt="Black 3D-printed FluoroScan enclosure with a camera module on top"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Assembled enclosure</figcaption>
-        </figure>
         <figure class="shot" data-lb data-cap="Twelve 450 nm LEDs wired in a 3-up ring around the imaging aperture">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-leds.webp" width="302" height="270" alt="Circular LED array with twelve LEDs wired in red and blue"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>12-LED excitation ring</figcaption>
@@ -1289,22 +1603,26 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       </div>
     </article>
 
-    <!-- ─────── 03 Multispectral ─────── -->
+    <!-- ─────── 04 Multispectral ─────── -->
     <article class="project rv">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 03</span>
+          <span class="mono p-num">Project 04</span>
           <h3>Multispectral Handheld Imaging Device</h3>
           <p class="p-tagline">Field-portable plant phenotyping instrument</p>
+          <p class="p-lead">
+            A phenotyping device that captures leaf detail at 0.04 mm/pixel across
+            six wavelength bands. I redesigned it so that every component fits
+            inside the enclosure.
+          </p>
           <ul class="tags">
             <li>Raspberry Pi</li><li>Electronics</li><li>MOSFET Switching</li><li>Reverse Engineering</li><li>SolidWorks</li>
           </ul>
         </div>
-        <p class="p-lead">
-          A phenotyping device that captures leaf detail at 0.04 mm/pixel across
-          six wavelength bands. I redesigned it so that every component fits
-          inside the enclosure.
-        </p>
+        <figure class="p-vis pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
+          <div class="frame"><img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Transparent CAD render showing internal Raspberry Pi and electronics layout"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <figcaption>Redesigned enclosure (CAD)</figcaption>
+        </figure>
       </div>
 
       <div class="details">
@@ -1328,17 +1646,12 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <h4 class="mono">Result</h4>
           <ul>
             <li>A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
-            <li>Detected plant stress <strong>days before visual symptoms</strong> appeared.</li>
             <li>Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication, which I am a co-author on.</li>
           </ul>
         </div>
       </div>
 
       <div class="gallery stg">
-        <figure class="shot pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
-          <div class="frame"><img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Transparent CAD render showing internal Raspberry Pi and electronics layout"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Redesign with internals housed</figcaption>
-        </figure>
         <figure class="shot pad" data-lb data-cap="The original device design, with the Raspberry Pi in an external housing and wiring running outside the body">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad.webp" width="361" height="380" alt="CAD render of the original handheld multispectral imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Original design (CAD)</figcaption>
@@ -1355,51 +1668,6 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <div class="frame"><img loading="lazy" src="images/multispectral-poster.webp" width="606" height="455" alt="Research poster describing the LeafSpec multispectral handheld imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Research poster</figcaption>
         </figure>
-      </div>
-    </article>
-
-    <!-- ─────── 04 Microscope Imager ─────── -->
-    <article class="project rv" id="microscope">
-      <div class="p-head">
-        <div>
-          <span class="mono p-num">Project 04 <b class="wip">In progress</b></span>
-          <h3>Leaf Cross-Section Microscope Imager</h3>
-          <p class="p-tagline">M.S. project, Purdue Plant Sensor Lab &middot; Jan 2026 to present</p>
-          <ul class="tags">
-            <li>Optics</li><li>Liquid Lens</li><li>Motor Control</li><li>Web Console</li><li>SolidWorks</li>
-          </ul>
-        </div>
-        <p class="p-lead">
-          A modular attachment for the lab's handheld 400&times; leaf microscope that
-          images a full corn-leaf cross section, so nitrogen status can be read
-          from the leaf's internal structure.
-        </p>
-      </div>
-
-      <div class="details">
-        <div>
-          <h4 class="mono">Problem</h4>
-          <ul>
-            <li>The microscope images a single spot at a time, so a full cross section cannot be captured in one go.</li>
-            <li>Its motor-and-gear focusing stage was too slow and too unstable for work at this magnification.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="mono">What I built</h4>
-          <ul>
-            <li>A <strong>motor-driven clamp and stage</strong> that moves the leaf laterally through the optical path, capturing the cross section frame by frame at 200&times;.</li>
-            <li>An <strong>electrically tunable liquid lens</strong> in place of the old focusing stage, removing the moving parts from focus entirely.</li>
-            <li>A <strong>web-based control console</strong> for lighting, motor motion, live view, capture and labelling, replacing a terminal-only workflow.</li>
-            <li>A desktop app that stitches the frames into a single image, with manual alignment, colour correction and side-by-side comparison.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="mono">Where it stands</h4>
-          <ul>
-            <li>The stage, liquid lens focusing and control console are built and running.</li>
-            <li>Still in active development, so there are no published results yet.</li>
-          </ul>
-        </div>
       </div>
     </article>
   </div>
@@ -1542,7 +1810,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           <span>Copy address</span>
         </button>
-        <a class="btn" href="Charles_Wang_Resume.pdf" target="_blank" rel="noopener">
+        <a class="btn" href="CharlesWangResume2026.pdf" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
           Résumé
         </a>
@@ -1565,7 +1833,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   <div class="wrap foot-in">
     <p>&copy; <span id="yr">2026</span> Charles Wang · Biological Engineering, Purdue University</p>
     <div class="foot-links">
-      <a href="Charles_Wang_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+      <a href="CharlesWangResume2026.pdf" target="_blank" rel="noopener">Résumé</a>
       <a href="Charles_Wang_Portfolio.pdf" target="_blank" rel="noopener">Portfolio PDF</a>
       <a href="#top">Back to top</a>
     </div>
@@ -1681,6 +1949,37 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     });
   }
 
+  /* ---------- nitrogen strip comparison: shared slider + synced scroll ---------- */
+  var stripPanes = Array.prototype.slice.call(document.querySelectorAll(".strip-scroll"));
+  var stripRange = document.getElementById("stripRange");
+  var stripSyncing = false;
+
+  // fractional position keeps edge and midrib aligned even though the
+  // two strips are not exactly the same pixel length
+  function stripPan(frac, skipPane, fromRange) {
+    stripSyncing = true;
+    stripPanes.forEach(function (pane) {
+      if (pane === skipPane) return;
+      pane.scrollLeft = frac * (pane.scrollWidth - pane.clientWidth);
+    });
+    if (stripRange && !fromRange) stripRange.value = Math.round(frac * 1000);
+    requestAnimationFrame(function () { stripSyncing = false; });
+  }
+
+  stripPanes.forEach(function (pane) {
+    pane.addEventListener("scroll", function () {
+      if (stripSyncing) return;
+      var max = pane.scrollWidth - pane.clientWidth;
+      stripPan(max > 0 ? pane.scrollLeft / max : 0, pane, false);
+    }, { passive: true });
+  });
+
+  if (stripRange) {
+    stripRange.addEventListener("input", function () {
+      stripPan(stripRange.value / 1000, null, true);
+    });
+  }
+
   /* ---------- copy email ---------- */
   var copyBtn = document.getElementById("copyMail");
   if (copyBtn) {
@@ -1758,10 +2057,6 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     var im = f.querySelector("img");
     return { src: im.getAttribute("src"), alt: im.getAttribute("alt") || "", cap: f.getAttribute("data-cap") || "" };
   });
-
-  // keep the hero badge honest if the gallery ever changes size
-  var counter = document.getElementById("shotCount");
-  if (counter) counter.textContent = items.length;
 
   var lb     = document.getElementById("lb");
   var lbImg  = document.getElementById("lbImg");
@@ -1844,7 +2139,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     f.addEventListener("click", function () { open(i); });
   });
 
-  // the fanned hero cards open their own image, not the hero's
+  // the deck cards open their own device image, not the hero's
   Array.prototype.forEach.call(document.querySelectorAll(".peek"), function (pk) {
     var im = pk.querySelector("img");
     if (!im) return;
