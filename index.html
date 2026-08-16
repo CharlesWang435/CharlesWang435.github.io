@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Charles Wang · Biological Engineering at Purdue</title>
-<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science at Purdue University. Four devices so far, each one designed, wired, and programmed from scratch.">
+<meta name="description" content="Charles Wang builds low-cost imaging instruments for plant science at Purdue University. Four devices so far: mechanical design, hand-built electronics, and custom software on every one.">
 <meta name="author" content="Charles Wang">
 <meta name="theme-color" content="#0e100f">
 
@@ -727,6 +727,251 @@ html[data-theme="dark"] .tags li { border-color: var(--border); }
 }
 
 /* ============================================================
+   shared panel shell for the in-project interactives
+   ============================================================ */
+/* the dark plate the strip comparison established: reads as an
+   instrument readout rather than another figure */
+.panel {
+  margin: 0 0 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #0b0d0c;
+  padding: 20px;
+  overflow: hidden;
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.panel-head .mono { color: #9fe0b4; font-size: .68rem; }
+.panel-head p { margin: 0; color: #6d746b; font-size: .74rem; line-height: 1.5; }
+.panel-note {
+  margin: 14px 0 0;
+  color: #6d746b;
+  font-size: .68rem;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   Fv/Fm saturation-pulse trace
+   ============================================================ */
+/* draws the measurement the FluoroScan optics are built around:
+   measuring light gives Fo, the saturating pulse gives Fm, and the
+   stress slider walks the ratio down the way photoinhibition does */
+.fvfm-stage {
+  position: relative;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #10130f, #0b0d0c);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.fvfm-stage svg { display: block; width: 100%; height: auto; }
+
+.fv-grid    { stroke: rgba(255,255,255,.07); stroke-width: 1; fill: none; }
+.fv-axis    { stroke: rgba(255,255,255,.22); stroke-width: 1; fill: none; }
+.fv-pulse   { fill: rgba(96,150,255,.16); }
+.fv-pulse-e { stroke: rgba(120,168,255,.42); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+.fv-guide   { stroke: rgba(159,224,180,.4); stroke-width: 1; stroke-dasharray: 4 4; fill: none; }
+.fv-vspan   { stroke: #9fe0b4; stroke-width: 1.2; fill: none; }
+.fv-trace   { stroke: #9fe0b4; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fv-head    { fill: #eaffef; }
+.fv-tick    { fill: #6d746b; font-size: 9px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.fv-key     { fill: #9fe0b4; font-size: 10px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.fv-key.dim { fill: #7d95ff; }
+/* annotations fade in only once the trace has actually reached them */
+.fv-ann { opacity: 0; transition: opacity .35s var(--ease-out); }
+.fv-ann.on { opacity: 1; }
+
+.fvfm-ctl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.fv-run {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(159,224,180,.35);
+  background: rgba(159,224,180,.09);
+  color: #9fe0b4;
+  font: inherit;
+  font-size: .78rem;
+  cursor: pointer;
+  transition: background .2s var(--ease), border-color .2s var(--ease);
+}
+.fv-run:hover { background: rgba(159,224,180,.17); border-color: rgba(159,224,180,.6); }
+.fv-run svg { width: 13px; height: 13px; }
+.fv-run.busy { opacity: .55; cursor: default; }
+
+.fv-slider { flex: 1 1 240px; display: flex; align-items: center; gap: 12px; }
+.fv-slider .mono { color: #6d746b; font-size: .62rem; flex: none; }
+.fv-slider input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  margin: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #9fe0b4, #c9a227 55%, #c4553b);
+  cursor: ew-resize;
+}
+.fv-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #eaffef;
+  border: 3px solid #0b0d0c;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.28);
+  cursor: ew-resize;
+  transition: transform .18s var(--ease);
+}
+.fv-slider input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+.fv-slider input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: transparent; }
+.fv-slider input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #eaffef;
+  border: 3px solid #0b0d0c;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.28);
+  cursor: ew-resize;
+}
+
+.fv-read {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 18px;
+  background: rgba(255,255,255,.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.fv-cell { background: #0b0d0c; padding: 12px 14px; }
+.fv-cell .mono { display: block; color: #6d746b; font-size: .6rem; margin-bottom: 4px; }
+.fv-cell b {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 1.22rem;
+  font-weight: 500;
+  color: #eef1ec;
+  font-variant-numeric: tabular-nums;
+}
+.fv-cell.key b { color: #9fe0b4; }
+.fv-cell small { display: block; color: #6d746b; font-size: .66rem; margin-top: 2px; }
+/* the mono label is uppercased; the subscript has to stay Fo, not FO */
+.fv-cell .mono sub { font-size: .8em; text-transform: lowercase; }
+
+/* ============================================================
+   original / redesign enclosure toggle
+   ============================================================ */
+.ab-tabs {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+}
+.ab-tab {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 15px;
+  background: transparent;
+  color: #8a918a;
+  font: inherit;
+  font-size: .76rem;
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.ab-tab:hover { color: #cfd6cd; }
+.ab-tab[aria-selected="true"] { background: rgba(159,224,180,.16); color: #9fe0b4; }
+
+.ab-stage {
+  position: relative;
+  border-radius: 8px;
+  background: #f4f5f2;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+.ab-view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s var(--ease-out);
+}
+.ab-view.on { opacity: 1; pointer-events: auto; }
+/* the marker is positioned against the image box, not the stage, so it
+   stays on the component at every viewport width */
+.ab-img { position: relative; height: 100%; max-width: 100%; }
+.ab-img img { width: 100%; height: 100%; display: block; }
+/* one marker, on the only component identifiable in the ghosted render */
+.ab-pin {
+  position: absolute;
+  width: 13px; height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(44,110,73,.25);
+}
+.ab-pin::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  animation: pinPulse 2.4s var(--ease-out) infinite;
+}
+@keyframes pinPulse {
+  0%   { transform: scale(1);   opacity: .9; }
+  70%  { transform: scale(2.5); opacity: 0; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.ab-pin span {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 5px;
+  background: rgba(11,13,12,.9);
+  color: #eef1ec;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .62rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.ab-notes { margin: 16px 0 0; padding: 0; list-style: none; }
+.ab-notes li {
+  position: relative;
+  padding-left: 20px;
+  color: #a6ada4;
+  font-size: .84rem;
+  line-height: 1.55;
+}
+.ab-notes li + li { margin-top: 7px; }
+.ab-notes li::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: .62em;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #3d443c;
+}
+.ab-notes li.good::before { background: #9fe0b4; }
+.ab-notes li strong { color: #eef1ec; font-weight: 600; }
+
+/* ============================================================
    gallery
    ============================================================ */
 .gallery {
@@ -1188,6 +1433,9 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   .scan-track { animation: none; }
   .scan-track img + img { display: none; }
   .scanband { overflow-x: auto; }
+  /* the trace is drawn complete instead of swept; the slider still works */
+  .fv-ann { opacity: 1; transition: none; }
+  .ab-pin::after { animation: none; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
@@ -1224,6 +1472,14 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   .scan-track img { height: 46px; margin-right: 60px; }
   .strip-compare { padding: 14px 14px 4px; }
   .strip-scroll img { height: 62px; }
+  .panel { padding: 15px; }
+  .panel-head { flex-direction: column; gap: 6px; }
+  .fv-read { grid-template-columns: 1fr; }
+  .fv-cell { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+  .fv-cell .mono { margin-bottom: 0; }
+  .fv-val { text-align: right; }
+  .ab-stage { aspect-ratio: 4/3; }
+  .ab-pin span { left: auto; right: 20px; }
 }
 
 @media (max-width: 430px) {
@@ -1236,7 +1492,13 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
 </head>
 
 <body>
-<script>document.documentElement.className='js';</script>
+<script>
+document.documentElement.className='js';
+/* theme is resolved here, before first paint, so the page never flashes light
+   on its way to the dark default */
+(function(){var s=null;try{s=localStorage.getItem("theme");}catch(e){}
+document.documentElement.setAttribute("data-theme",s||"dark");})();
+</script>
 
 <!-- ══════ nav ══════ -->
 <nav id="nav">
@@ -1249,7 +1511,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       <a href="CharlesWangResume2026.pdf" target="_blank" rel="noopener">Résumé</a>
       <a href="#contact">Contact</a>
     </div>
-    <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle color theme">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
@@ -1264,9 +1526,9 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       <span class="mono eyebrow">Biological Engineering · Purdue</span>
       <h1>Charles&nbsp;Wang</h1>
       <p class="hero-sub">
-        I build <strong>handheld leaf imaging instruments</strong>.
-        Four of them so far, each one designed in CAD, wired by hand, and
-        programmed from scratch.
+        I've built four <strong>handheld leaf imaging
+        instruments</strong>, from the CAD models down to the
+        software that runs them.
       </p>
       <div class="cta">
         <a class="btn solid" href="#work">
@@ -1294,9 +1556,9 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
       <span class="peek p2" aria-hidden="true"><img src="images/fluoroscan-device.webp" alt="" loading="lazy"><span class="peek-tag">FluoroScan</span></span>
       <span class="peek p1" aria-hidden="true"><img src="images/leafdoc-device.webp" alt="" loading="lazy"><span class="peek-tag">LeafDoc</span></span>
 
-      <figure class="hero-shot" data-lb data-cap="Prototype 1 of the cross-section imager: the motorised clamp, rail and focusing drive built onto the lab's handheld leaf microscope">
+      <figure class="hero-shot" data-lb data-cap="Prototype 1 of the cross-section imager: the motorized clamp, rail and focusing drive built onto the lab's handheld leaf microscope">
         <div class="frame">
-          <img src="images/microscope-hero.webp" width="900" height="1200" alt="The cross-section microscope imager: a handheld leaf microscope fitted with the motorised cross-section attachment">
+          <img src="images/microscope-hero.webp" width="900" height="1200" alt="The cross-section microscope imager: a handheld leaf microscope fitted with the motorized cross-section attachment">
         </div>
         <figcaption>Cross-Section Imager &middot; the latest of four builds</figcaption>
       </figure>
@@ -1310,7 +1572,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     <div class="stat"><b><span class="num" data-count="200" data-suffix="&times;">200&times;</span></b><span>Capture magnification<span class="stat-dev">Cross-Section Imager</span></span></div>
     <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span>Lightbox build cost<span class="stat-dev">LeafDoc</span></span></div>
     <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span>LEDs hand-soldered<span class="stat-dev">Multispectral Imager</span></span></div>
-    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per pixel resolution<span class="stat-dev">Multispectral Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per-pixel resolution<span class="stat-dev">Multispectral Imager</span></span></div>
   </div>
 </div>
 
@@ -1322,7 +1584,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     <div class="sec-head narrow rv">
       <span class="mono">Selected Work</span>
       <h2>Four instruments I designed and built</h2>
-      <p>Each one started as a CAD sketch and ended up working in the lab. I did
+      <p>Each one started in SolidWorks and ended up working in the lab. I did
          the mechanical design, the circuit assembly, and the software for all
          four.</p>
     </div>
@@ -1333,7 +1595,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         <div>
           <span class="mono p-num">Project 01 <b class="wip">In progress</b></span>
           <h3>Leaf Cross-Section Microscope Imager</h3>
-          <p class="p-tagline">M.S. project, Purdue Plant Sensor Lab &middot; Jan 2026 to present</p>
+          <p class="p-tagline">M.S. project, Purdue ABE Plant Sensor Lab &middot; Jan 2026 to present</p>
           <p class="p-lead">
             A modular attachment for the lab's handheld 400&times; leaf microscope that
             images a full corn-leaf cross section, so nitrogen status can be read
@@ -1364,23 +1626,23 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <ul>
             <li>The microscope sees one spot at a time, and its autofocus hunts for peak sharpness by stepping the leaf platform down a threaded-rod stage, taking <strong>about a minute per frame</strong>.</li>
             <li>Play in the platform's guide rods tilts each shot slightly. That is negligible on a leaf surface, but enough to push a thin cross section out of the frame entirely.</li>
-            <li>Autofocus scores sharpness at the centre of the view, and a cut corn leaf is rarely centred, so it often locked onto the empty stage instead of the leaf.</li>
+            <li>Autofocus scores sharpness at the center of the view, and a cut corn leaf is rarely centered, so it often locks onto the empty stage instead of the leaf.</li>
           </ul>
         </div>
         <div>
           <h4 class="mono">Prototype 1 &middot; built</h4>
           <ul>
-            <li>A <strong>3D-printed clamp on a motorised linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
-            <li>A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) added live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
+            <li>A <strong>3D-printed clamp on a motorized linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
+            <li>A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) adds live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
             <li><strong>21 corn-leaf cross sections</strong> captured edge to midrib, each stitched from around 40 frames in a companion desktop app.</li>
-            <li>The catch: focusing every frame by hand took roughly 20 seconds each, so one leaf took <strong>over 13 minutes</strong>.</li>
+            <li>The catch: focusing each frame by hand took roughly 20 seconds, so one leaf took <strong>over 13 minutes</strong>.</li>
           </ul>
         </div>
         <div>
           <h4 class="mono">Prototype 2 &middot; in progress</h4>
           <ul>
-            <li>An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt stops mattering.</li>
-            <li>The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-centre linear actuator whose weight caused the tilt and lighting drift.</li>
+            <li>An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt no longer matters.</li>
+            <li>The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-center linear actuator whose overhung weight tilted the stage and let in stray light.</li>
             <li>Target: a full cross-section scan in <strong>under 1 minute per leaf</strong>, down from 13.</li>
           </ul>
         </div>
@@ -1399,14 +1661,14 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
             <span class="mono">0% nitrogen</span>
             <span>Tall_TC_112 &middot; edge to midrib</span>
           </div>
-          <div class="strip-scroll"><img src="images/microscope-strip-0n.webp" width="2805" height="48" alt="Stitched microscope cross section of a corn leaf grown with no nitrogen fertiliser" loading="lazy"></div>
+          <div class="strip-scroll"><img src="images/microscope-strip-0n.webp" width="2805" height="48" alt="Stitched microscope cross section of a corn leaf grown with no nitrogen fertilizer" loading="lazy"></div>
         </div>
         <div class="strip-slider">
           <span class="mono">Edge</span>
           <input type="range" id="stripRange" min="0" max="1000" value="0" aria-label="Pan both strips along the leaf, from edge to midrib">
           <span class="mono">Midrib</span>
         </div>
-        <p class="strip-hint mono">Drag the slider to travel both leaves at once, the way the rail walks them under the lens</p>
+        <p class="strip-hint mono">Drag the slider to pan both leaves at once, the way the rail walks them under the lens</p>
       </div>
 
       <div class="gallery stg">
@@ -1451,7 +1713,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         <div>
           <span class="mono p-num">Project 02</span>
           <h3>LeafDoc</h3>
-          <p class="p-tagline">Smartphone plant imaging system with AI-powered diagnosis</p>
+          <p class="p-tagline">Smartphone plant imaging system with in-app AI diagnosis</p>
           <p class="p-lead">
             A $50 handheld lightbox that blocks ambient light and lights the leaf
             evenly. A phone snaps onto the top surface, ready to image through
@@ -1548,7 +1810,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         <div>
           <h4 class="mono">The physics</h4>
           <ul>
-            <li>A weak, non-actinic light opens the PSII reaction centers and gives the baseline fluorescence, <strong>F<sub>o</sub></strong>.</li>
+            <li>After dark adaptation every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
             <li>A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
             <li>The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
           </ul>
@@ -1557,8 +1819,8 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <h4 class="mono">What I built</h4>
           <ul>
             <li>Prototyped in SolidWorks and printed on Bambu Lab hardware.</li>
-            <li>A Raspberry Pi drives the camera and system control.</li>
-            <li><strong>450 nm excitation</strong> at 4000 µmol m⁻²s⁻¹ from 12 LEDs in a 3-up configuration on an angled mount.</li>
+            <li>A Raspberry Pi handles camera and system control.</li>
+            <li><strong>450 nm excitation</strong> at 4000 µmol m⁻² s⁻¹ from 12 LEDs in a 3-up configuration on an angled mount.</li>
             <li>Emission captured through a <strong>680/720 nm</strong> filter after dark adaptation.</li>
           </ul>
         </div>
@@ -1571,12 +1833,97 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         </div>
       </div>
 
+      <!-- the measurement the optics are built around, drawn out -->
+      <div class="panel" id="fvfm">
+        <div class="panel-head">
+          <span class="mono">The measurement</span>
+          <p>Run the pulse, then drag the leaf from healthy toward stressed</p>
+        </div>
+
+        <div class="fvfm-stage">
+          <svg viewBox="0 0 760 300" role="img" aria-labelledby="fvTitle fvDesc">
+            <title id="fvTitle">Chlorophyll fluorescence through a saturation-pulse measurement</title>
+            <desc id="fvDesc">A trace of fluorescence yield over time. The measuring light raises it to a
+              steady baseline F-o, a saturating pulse drives it up to the maximum F-m, and it relaxes back
+              once the pulse ends. The gap between the two levels is the variable fluorescence F-v.</desc>
+
+            <!-- saturating pulse window -->
+            <rect class="fv-pulse" x="306" y="18" width="160" height="240"/>
+            <path class="fv-pulse-e" d="M306 18V258M466 18V258"/>
+            <text class="fv-key dim" x="386" y="33" text-anchor="middle">450 nm</text>
+
+            <path class="fv-grid" d="M52 80.2H720M52 169.1H720"/>
+            <path class="fv-axis" d="M52 18V258H720"/>
+
+            <text class="fv-tick" x="44" y="261" text-anchor="end">0</text>
+            <text class="fv-tick" x="44" y="172" text-anchor="end">0.5</text>
+            <text class="fv-tick" x="44" y="83" text-anchor="end">1.0</text>
+            <text class="fv-tick" transform="translate(14 138) rotate(-90)" text-anchor="middle">fluorescence yield (a.u.)</text>
+
+            <text class="fv-tick" x="78" y="276" text-anchor="middle">dark</text>
+            <text class="fv-tick" x="206" y="276" text-anchor="middle">measuring light</text>
+            <text class="fv-tick" x="386" y="276" text-anchor="middle">saturating pulse</text>
+            <text class="fv-tick" x="593" y="276" text-anchor="middle">relaxation</text>
+
+            <!-- levels, revealed as the trace actually reaches them -->
+            <g class="fv-ann" id="fvAnnF0">
+              <line class="fv-guide" id="fvF0Line" x1="52" x2="720" y1="0" y2="0"/>
+              <text class="fv-key" id="fvF0Lab" x="726" y="0">F<tspan dy="2" font-size="7">o</tspan></text>
+            </g>
+            <g class="fv-ann" id="fvAnnFm">
+              <line class="fv-guide" id="fvFmLine" x1="52" x2="720" y1="0" y2="0"/>
+              <text class="fv-key" id="fvFmLab" x="726" y="0">F<tspan dy="2" font-size="7">m</tspan></text>
+            </g>
+            <g class="fv-ann" id="fvAnnSpan">
+              <path class="fv-vspan" id="fvSpan" d=""/>
+              <text class="fv-key" id="fvSpanLab" x="282" y="0">F<tspan dy="2" font-size="7">v</tspan></text>
+            </g>
+
+            <path class="fv-trace" id="fvTrace" d=""/>
+            <circle class="fv-head" id="fvHead" r="3.6" cx="52" cy="258"/>
+          </svg>
+        </div>
+
+        <div class="fvfm-ctl">
+          <button class="fv-run" id="fvRun" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            <span>Run measurement</span>
+          </button>
+          <div class="fv-slider">
+            <span class="mono">Healthy</span>
+            <input type="range" id="fvStress" min="0" max="100" value="0" aria-label="Leaf condition, from healthy to photoinhibited">
+            <span class="mono">Stressed</span>
+          </div>
+        </div>
+
+        <div class="fv-read">
+          <div class="fv-cell">
+            <span class="mono">F<sub>o</sub> &middot; baseline</span>
+            <div class="fv-val"><b id="fvOutF0">0.20</b><small>PSII centres open</small></div>
+          </div>
+          <div class="fv-cell">
+            <span class="mono">F<sub>m</sub> &middot; maximum</span>
+            <div class="fv-val"><b id="fvOutFm">1.18</b><small>PSII centres closed</small></div>
+          </div>
+          <div class="fv-cell key">
+            <span class="mono">F<sub>v</sub> / F<sub>m</sub></span>
+            <div class="fv-val"><b id="fvOutR">0.831</b><small id="fvOutNote">healthy dark-adapted range</small></div>
+          </div>
+        </div>
+
+        <p class="panel-note">
+          An illustration of the measurement principle, on published F<sub>v</sub>/F<sub>m</sub> values
+          &mdash; not FluoroScan output. The instrument is a prototype and has not been validated
+          against a commercial fluorometer.
+        </p>
+      </div>
+
       <div class="gallery stg">
         <figure class="shot" data-lb data-cap="Twelve 450 nm LEDs wired in a 3-up ring around the imaging aperture">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-leds.webp" width="302" height="270" alt="Circular LED array with twelve LEDs wired in red and blue"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>12-LED excitation ring</figcaption>
         </figure>
-        <figure class="shot" data-lb data-cap="A single LED star board, soldered and labelled before installation into the ring">
+        <figure class="shot" data-lb data-cap="A single LED star board, soldered and labeled before installation into the ring">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-led-board.webp" width="247" height="214" alt="Hand holding a soldered LED star board with yellow and blue wires"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>LED board detail</figcaption>
         </figure>
@@ -1638,7 +1985,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <ul>
             <li><strong>Reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure so all the electronics sit inside it.</li>
             <li><strong>120+ LEDs</strong> hand-soldered across 6 wavelength bands.</li>
-            <li>MOSFET transistor switching with 12V/5V power conversion.</li>
+            <li>MOSFET switching with 12V/5V power conversion.</li>
             <li>Raspberry Pi for camera control and capture sequencing.</li>
           </ul>
         </div>
@@ -1646,9 +1993,36 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <h4 class="mono">Result</h4>
           <ul>
             <li>A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
-            <li>Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication, which I am a co-author on.</li>
+            <li>Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication I co-authored.</li>
           </ul>
         </div>
+      </div>
+
+      <!-- what the rebuild actually changed, switchable in place -->
+      <div class="panel" id="encl">
+        <div class="panel-head">
+          <div class="ab-tabs" role="tablist" aria-label="Enclosure design">
+            <button class="ab-tab" id="abTabA" type="button" role="tab" aria-selected="false" aria-controls="abViewA">Original</button>
+            <button class="ab-tab" id="abTabB" type="button" role="tab" aria-selected="true" aria-controls="abViewB">My redesign</button>
+          </div>
+          <p>Switch between the two builds</p>
+        </div>
+
+        <div class="ab-stage">
+          <div class="ab-view" id="abViewA" role="tabpanel" aria-labelledby="abTabA">
+            <div class="ab-img" style="aspect-ratio: 361/380">
+              <img loading="lazy" src="images/multispectral-cad.webp" width="361" height="380" alt="CAD render of the original handheld multispectral imaging device with an external controller housing">
+            </div>
+          </div>
+          <div class="ab-view on" id="abViewB" role="tabpanel" aria-labelledby="abTabB">
+            <div class="ab-img" style="aspect-ratio: 463/371">
+              <img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Ghosted CAD render of the redesigned enclosure with the Raspberry Pi mounted on the inner wall">
+              <span class="ab-pin" style="left: 17.3%; top: 41%"><span>Raspberry Pi</span></span>
+            </div>
+          </div>
+        </div>
+
+        <ul class="ab-notes" id="abNotes"></ul>
       </div>
 
       <div class="gallery stg">
@@ -1657,11 +2031,11 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <figcaption>Original design (CAD)</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="A leaf captured at 0.04 mm/pixel with ambient light fully blocked, resolving the secondary veins">
-          <div class="frame"><img loading="lazy" src="images/multispectral-capture.webp" width="405" height="251" alt="High resolution multispectral capture of a leaf against a bright background"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <div class="frame"><img loading="lazy" src="images/multispectral-capture.webp" width="405" height="251" alt="High-resolution multispectral capture of a leaf against a bright background"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Capture at 0.04 mm/pixel</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Treatment time series across 2,4-D, Dicamba, and untreated control samples">
-          <div class="frame"><img loading="lazy" src="images/multispectral-timeseries.webp" width="417" height="238" alt="Grid of false-colour leaf images across treatments and time points"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
+          <div class="frame"><img loading="lazy" src="images/multispectral-timeseries.webp" width="417" height="238" alt="Grid of false-color leaf images across treatments and time points"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
           <figcaption>Treatment time series</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="LeafSpec research poster from the Institute for Digital Forestry at Purdue University">
@@ -1693,7 +2067,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         <p class="tl-note">A Purdue startup building handheld hyperspectral leaf imagers for plant scientists and breeders.</p>
         <ul>
           <li>Design and build handheld plant-imaging instruments: mechanical design in SolidWorks, FDM 3D printing, and integration of microcontrollers, motors, LED lighting and cameras into working prototypes.</li>
-          <li>Collected the hyperspectral and multispectral leaf data for a <strong>peer-reviewed study on herbicide crop injury</strong>. That dataset trained machine learning models which reached 90% classification accuracy.</li>
+          <li>Collected the hyperspectral and multispectral leaf data for a <strong>peer-reviewed study on herbicide crop injury</strong>. That dataset trained machine learning models that reached 90% classification accuracy.</li>
           <li>Work directly with agronomy and weed science researchers to define device requirements, including corn leaf scans in under 10 seconds and GPS/GIS tagging that maps each scan to its field location.</li>
         </ul>
       </div>
@@ -1704,7 +2078,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
           <span class="tl-date mono">May &ndash; Jul 2024</span>
         </div>
         <p class="tl-org">Institute for Digital Forestry, Purdue University</p>
-        <p class="tl-note">Paid summer research programme, placed in the ABE Plant Sensor Lab.</p>
+        <p class="tl-note">Paid summer research program, placed in the ABE Plant Sensor Lab.</p>
         <ul>
           <li>Rebuilt an undocumented multispectral leaf imager (UV to IR) from legacy SolidWorks files alone: reverse-engineered the assembly, 3D-printed the parts, and wired the camera, microcontroller and drive electronics.</li>
           <li>Redesigned the top enclosure so the microcontroller and driver board sit inside the main housing, replacing an external tethered box and <strong>cutting total device volume by roughly 30%</strong>.</li>
@@ -1726,10 +2100,10 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
         </div>
       </div>
       <div class="cred-col">
-        <h3 class="mono">Honours &amp; leadership</h3>
+        <h3 class="mono">Honors &amp; leadership</h3>
         <div class="cred-item">
           <b>Top 10, Indiana Soybean Innovation Competition</b>
-          <span>2024 &middot; co-created Soysheets, a 67% soy detergent and dryer sheet</span>
+          <span>2024 &middot; co-created Soysheets, a combined detergent and dryer sheet that is 67% soy</span>
         </div>
         <div class="cred-item">
           <b>Executive Board, Assoc. of Hip Hop Practitioners &amp; Scholars</b>
@@ -1867,10 +2241,9 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
 
   /* ---------- theme ---------- */
   var root = document.documentElement;
-  var saved = null;
-  try { saved = localStorage.getItem("theme"); } catch (e) {}
-  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  root.setAttribute("data-theme", saved || (prefersDark ? "dark" : "light"));
+  // data-theme is already on <html> from the inline bootstrap above; dark is the
+  // default and the OS preference does not override it, only a saved choice.
+  // from here the button just flips it.
 
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -1978,6 +2351,183 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
     stripRange.addEventListener("input", function () {
       stripPan(stripRange.value / 1000, null, true);
     });
+  }
+
+  /* ---------- FluoroScan: Fv/Fm saturation-pulse trace ---------- */
+  var fvPanel = document.getElementById("fvfm");
+  if (fvPanel) {
+    var FV_X0 = 52, FV_X1 = 720, FV_BASE = 258, FV_TOP = 18, FV_FULL = 1.35;
+    var fvTrace   = document.getElementById("fvTrace");
+    var fvHead    = document.getElementById("fvHead");
+    var fvF0Line  = document.getElementById("fvF0Line");
+    var fvF0Lab   = document.getElementById("fvF0Lab");
+    var fvFmLine  = document.getElementById("fvFmLine");
+    var fvFmLab   = document.getElementById("fvFmLab");
+    var fvSpan    = document.getElementById("fvSpan");
+    var fvSpanLab = document.getElementById("fvSpanLab");
+    var fvAnnF0   = document.getElementById("fvAnnF0");
+    var fvAnnFm   = document.getElementById("fvAnnFm");
+    var fvAnnSpan = document.getElementById("fvAnnSpan");
+    var fvStress  = document.getElementById("fvStress");
+    var fvRun     = document.getElementById("fvRun");
+    var fvOutF0   = document.getElementById("fvOutF0");
+    var fvOutFm   = document.getElementById("fvOutFm");
+    var fvOutR    = document.getElementById("fvOutR");
+    var fvOutNote = document.getElementById("fvOutNote");
+
+    // phase boundaries along the time axis, as fractions of its width
+    var FV_LIT = 0.08, FV_HOLD = 0.20, FV_PULSE = 0.38, FV_PEAK = 0.50, FV_OFF = 0.62;
+
+    // stress lifts the baseline and pulls the ceiling down, the way
+    // photoinhibition does: 0.83 at rest, about 0.52 fully stressed
+    function fvLevels(s) {
+      var f0 = 0.20 + 0.10 * s, fm = 1.18 - 0.55 * s;
+      return { f0: f0, fm: fm, ratio: (fm - f0) / fm };
+    }
+
+    function fvAt(t, L) {
+      if (t <= FV_LIT) return 0;
+      if (t <= FV_HOLD) {
+        var a = (t - FV_LIT) / (FV_HOLD - FV_LIT);
+        return L.f0 * (1 - Math.pow(1 - a, 3));
+      }
+      if (t <= FV_PULSE) return L.f0;
+      if (t <= FV_PEAK) {
+        var b = (t - FV_PULSE) / (FV_PEAK - FV_PULSE);
+        return L.f0 + (L.fm - L.f0) * (1 - Math.pow(1 - b, 2.2));
+      }
+      if (t <= FV_OFF) return L.fm;
+      return L.f0 + (L.fm - L.f0) * Math.exp(-4.2 * (t - FV_OFF) / (1 - FV_OFF));
+    }
+
+    function fvX(t) { return FV_X0 + t * (FV_X1 - FV_X0); }
+    function fvY(v) { return FV_BASE - (v / FV_FULL) * (FV_BASE - FV_TOP); }
+
+    // one fixed sample grid with the corners pinned into it, so the kinks
+    // sit still instead of shimmering as the sweep advances
+    var FV_TS = (function () {
+      var a = [], i;
+      for (i = 0; i <= 240; i++) a.push(i / 240);
+      a.push(FV_LIT, FV_HOLD, FV_PULSE, FV_PEAK, FV_OFF);
+      return a.sort(function (p, q) { return p - q; });
+    })();
+
+    function fvPath(upTo, L) {
+      var d = "", i, t;
+      for (i = 0; i < FV_TS.length; i++) {
+        t = FV_TS[i];
+        if (t > upTo) break;
+        d += (d ? "L" : "M") + fvX(t).toFixed(1) + " " + fvY(fvAt(t, L)).toFixed(1);
+      }
+      return d + (d ? "L" : "M") + fvX(upTo).toFixed(1) + " " + fvY(fvAt(upTo, L)).toFixed(1);
+    }
+
+    function fvVerdict(r) {
+      if (r >= 0.78) return "healthy dark-adapted range";
+      if (r >= 0.65) return "mild stress";
+      if (r >= 0.50) return "clear photoinhibition";
+      return "severe photoinhibition";
+    }
+
+    var fvProg = 1, fvRaf = null;
+
+    function fvDraw() {
+      var L = fvLevels(fvStress.value / 100);
+      var y0 = fvY(L.f0).toFixed(1), ym = fvY(L.fm).toFixed(1);
+
+      fvTrace.setAttribute("d", fvPath(fvProg, L));
+      fvHead.setAttribute("cx", fvX(fvProg).toFixed(1));
+      fvHead.setAttribute("cy", fvY(fvAt(fvProg, L)).toFixed(1));
+      fvHead.style.opacity = fvProg < 1 ? "1" : "0";
+
+      fvF0Line.setAttribute("y1", y0);
+      fvF0Line.setAttribute("y2", y0);
+      fvF0Lab.setAttribute("y", (+y0 + 3.5).toFixed(1));
+      fvFmLine.setAttribute("y1", ym);
+      fvFmLine.setAttribute("y2", ym);
+      fvFmLab.setAttribute("y", (+ym + 3.5).toFixed(1));
+      fvSpan.setAttribute("d", "M270 " + ym + "V" + y0 + "M264 " + ym + "H276M264 " + y0 + "H276");
+      fvSpanLab.setAttribute("y", ((+ym + +y0) / 2 + 3.5).toFixed(1));
+
+      // a level is only labelled once the trace has actually reached it
+      fvAnnF0.classList.toggle("on", fvProg >= FV_HOLD);
+      fvAnnFm.classList.toggle("on", fvProg >= FV_PEAK);
+      fvAnnSpan.classList.toggle("on", fvProg >= FV_PEAK);
+
+      fvOutF0.textContent = L.f0.toFixed(2);
+      fvOutFm.textContent = L.fm.toFixed(2);
+      fvOutR.textContent = L.ratio.toFixed(3);
+      fvOutNote.textContent = fvVerdict(L.ratio);
+    }
+
+    function fvPlay() {
+      if (fvRaf) { cancelAnimationFrame(fvRaf); fvRaf = null; }
+      if (reduce) { fvProg = 1; fvDraw(); return; }
+      var t0 = null;
+      fvRun.classList.add("busy");
+      fvRaf = requestAnimationFrame(function step(ts) {
+        if (t0 === null) t0 = ts;
+        fvProg = Math.min((ts - t0) / 3200, 1);
+        fvDraw();
+        if (fvProg < 1) { fvRaf = requestAnimationFrame(step); }
+        else { fvRaf = null; fvRun.classList.remove("busy"); }
+      });
+    }
+
+    fvStress.addEventListener("input", fvDraw);
+    fvRun.addEventListener("click", fvPlay);
+    fvDraw();                                    // complete trace, in case it is never scrolled to
+
+    if (!reduce && "IntersectionObserver" in window) {
+      var fvObs = new IntersectionObserver(function (en, obs) {
+        en.forEach(function (e) {
+          if (e.isIntersecting) { fvPlay(); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.35 });
+      fvObs.observe(fvPanel);
+    }
+  }
+
+  /* ---------- multispectral: original vs redesigned enclosure ---------- */
+  var abTabs = [document.getElementById("abTabA"), document.getElementById("abTabB")];
+  var abViews = [document.getElementById("abViewA"), document.getElementById("abViewB")];
+  var abNotes = document.getElementById("abNotes");
+
+  if (abTabs[0] && abNotes) {
+    var AB_COPY = [
+      [
+        { txt: "Raspberry Pi in an <strong>external housing</strong>, hung off the body" },
+        { txt: "Wiring <strong>ran outside the enclosure</strong>, between the head and the controller" },
+        { txt: "<strong>Nothing documented</strong> &mdash; every subsystem had to be traced before it could change" }
+      ],
+      [
+        { txt: "<strong>Raspberry Pi mounted on the inner wall</strong>, inside the shell", good: true },
+        { txt: "<strong>All electronics internal</strong>, MOSFET switching and 12V/5V conversion included", good: true },
+        { txt: "<strong>Every subsystem reverse-engineered and documented</strong> before the rebuild", good: true }
+      ]
+    ];
+
+    var abShow = function (i) {
+      abTabs.forEach(function (t, n) { t.setAttribute("aria-selected", n === i ? "true" : "false"); });
+      abViews.forEach(function (v, n) { v.classList.toggle("on", n === i); });
+      abNotes.innerHTML = AB_COPY[i].map(function (n) {
+        return "<li" + (n.good ? ' class="good"' : "") + ">" + n.txt + "</li>";
+      }).join("");
+    };
+
+    abTabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { abShow(i); });
+      // left/right walks the pair, the way a tablist is expected to
+      t.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        e.preventDefault();
+        var next = (i + (e.key === "ArrowRight" ? 1 : abTabs.length - 1)) % abTabs.length;
+        abShow(next);
+        abTabs[next].focus();
+      });
+    });
+
+    abShow(1);                                   // open on the redesign
   }
 
   /* ---------- copy email ---------- */
