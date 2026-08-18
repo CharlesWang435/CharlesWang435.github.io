@@ -1642,12 +1642,10 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
           <h3 data-k="k13">Leaf Cross-Section Microscope Imager</h3>
           <p data-k="k14" class="p-tagline">M.S. project, Purdue ABE Plant Sensor Lab &middot; Jan 2026 to present</p>
           <p data-k="k15" class="p-lead">
-            A modular attachment for the lab's handheld 400&times; leaf microscope that
-            images a full corn-leaf cross section, so nitrogen status can be read
-            from the leaf's internal structure.
-          </p>
+            A modular attachment for the lab's handheld 400× leaf microscope that
+            images a full corn-leaf cross section, enabling nitrogen estimation from internal leaf structure.</p>
           <ul class="tags">
-            <li data-k="k16">Optics</li><li data-k="k17">Liquid Lens</li><li data-k="k18">Rack &amp; Pinion</li><li data-k="k19">Motor Control</li><li data-k="k20">Web Console</li><li data-k="k21">SolidWorks</li>
+            <li data-k="k16">Optics</li><li data-k="k17">Liquid Lens</li><li data-k="k18">3D Printing</li><li data-k="k19">Motor Control</li><li data-k="k20">Web Console</li><li data-k="k21">SolidWorks</li>
           </ul>
         </div>
         <figure class="p-vis" data-lb data-cap="The first prototype assembled on the handheld microscope, with the focusing drive, linear actuator and control electronics">
@@ -1713,7 +1711,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
           <input type="range" id="stripRange" min="0" max="1000" value="0" aria-label="Pan both strips along the leaf, from edge to midrib">
           <span data-k="k42" class="mono">Midrib</span>
         </div>
-        <p data-k="k43" class="strip-hint mono">Drag the slider to pan both leaves at once, the way the rail walks them under the lens</p>
+        <p data-k="k43" class="strip-hint mono">Drag the slider to pan both leaves at once</p>
       </div>
 
       <div class="gallery stg">
@@ -1762,8 +1760,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
           <p data-k="k55" class="p-lead">
             A $50 handheld lightbox that blocks ambient light and lights the leaf
             evenly. A phone snaps onto the top surface, ready to image through
-            the LeafDoc app &mdash; turning an ordinary smartphone into a
-            repeatable imaging rig.
+            the LeafDoc app, turning an ordinary smartphone into a professional imaging rig.
           </p>
           <ul class="tags">
             <li data-k="k56">SolidWorks</li><li data-k="k57">Kotlin</li><li data-k="k58">CameraX</li><li data-k="k59">Image Stitching</li><li data-k="k60">3D Printing</li>
@@ -1855,7 +1852,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
         <div>
           <h4 data-k="k89" class="mono">The physics</h4>
           <ul>
-            <li data-k="k90">After dark adaptation &mdash; overnight, covered, in a dark room &mdash; every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
+            <li data-k="k90">After dark adaptation, every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
             <li data-k="k91">A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
             <li data-k="k92">The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
           </ul>
@@ -1957,8 +1954,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
         </div>
 
         <p data-k="k110" class="panel-note">
-          An illustration of the measurement principle, on published F<sub>v</sub>/F<sub>m</sub> values
-          &mdash; not FluoroScan output. The instrument is a prototype and has not been validated
+          An illustration of the measurement principle, on published F<sub>v</sub>/F<sub>m</sub> values. This is not FluoroScan output. The instrument is a prototype and has not been validated
           against a commercial fluorometer.
         </p>
       </div>
@@ -2001,14 +1997,14 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
         <div>
           <span data-k="k118" class="mono p-num">Project 04</span>
           <h3 data-k="k119">Multispectral Handheld Imaging Device</h3>
-          <p data-k="k120" class="p-tagline">Field-portable plant phenotyping instrument</p>
+          <p data-k="k120" class="p-tagline">Field-portable multispectral plant phenotyping instrument</p>
           <p data-k="k121" class="p-lead">
             A phenotyping device that captures leaf detail at 0.04 mm/pixel across
             six wavelength bands. I redesigned it so that every component fits
             inside the enclosure.
           </p>
           <ul class="tags">
-            <li data-k="k122">Raspberry Pi</li><li data-k="k123">Electronics</li><li data-k="k124">MOSFET Switching</li><li data-k="k125">Reverse Engineering</li><li data-k="k126">SolidWorks</li>
+            <li data-k="k122">Raspberry Pi</li><li data-k="k123">3D Printing</li><li data-k="k124">MOSFET Switching</li><li data-k="k125">Reverse Engineering</li><li data-k="k126">SolidWorks</li>
           </ul>
         </div>
         <figure class="p-vis pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
@@ -2122,8 +2118,8 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
         <p data-k="k160" class="tl-note">A Purdue ag-tech startup (Prof. Jian Jin) commercialising handheld leaf imagers for farmers and researchers.</p>
         <ul>
           <li data-k="k161">Engineer handheld crop-imaging instruments from concept to field deployment: enclosures and mechanisms in SolidWorks, 3D-printed prototypes, and cameras, LED illumination, motors and microcontrollers integrated into devices plant researchers use daily.</li>
-          <li data-k="k162">Build the software that runs each instrument alongside the hardware &mdash; web control consoles, Android apps, and LLM-based analysis that flags plant stress and disease from leaf images.</li>
-          <li data-k="k163">LeafDoc capture hardware supports a <strong>Purdue&ndash;DARPA project using plants as chemical sentinels</strong>, and lab imagers are in use by partners including <strong>Corteva</strong>.</li>
+          <li data-k="k162">Build the software that runs each instrument alongside the hardware — web control consoles, Android apps, and LLM-based analysis that flags plant stress and disease from RGB leaf images.</li>
+          <li data-k="k163">LeafDoc hardware supports a <strong>Purdue–DARPA project using plants as chemical sentinels</strong>, and lab imagers are in use by partners including <strong>Corteva</strong>.</li>
         </ul>
       </div>
 
@@ -2136,8 +2132,8 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
         <p data-k="k167" class="tl-note">Paid summer research program, placed in the ABE Plant Sensor Lab.</p>
         <ul>
           <li data-k="k168">Rebuilt the lab's undocumented <strong>LeafSpec-Multi</strong> multispectral imager from its SolidWorks assembly alone: tore down the legacy unit to learn how it worked, 3D-printed every part, and rebuilt the complete device.</li>
-          <li data-k="k169">Hand-soldered a <strong>120+ LED illumination board</strong> across 6 wavelength bands, visible and IR, with MOSFET drivers per band on Raspberry Pi GPIO and a 12&nbsp;V&rarr;5&nbsp;V converter.</li>
-          <li data-k="k170">Designed a new top enclosure that moved the Pi, driver board and converter from an external tethered box into the device body &mdash; <strong>~30% smaller</strong> and genuinely handheld &mdash; and added GPS/GIS geo-referenced capture through the app.</li>
+          <li data-k="k169">Hand-soldered a <strong>120+ LED illumination board</strong> across 6 wavelength bands, UV and IR, with MOSFET drivers per band on Raspberry Pi GPIO and a 12&nbsp;V→5&nbsp;V converter.</li>
+          <li data-k="k170">Designed a new top enclosure that moved the Pi, driver board and converter from an external tethered box into the device body, resulting it to be&nbsp;<strong>~30% smaller</strong> and genuinely handheld, and added GPS/GIS geo-referenced capture through the app.</li>
         </ul>
       </div>
     </div>
