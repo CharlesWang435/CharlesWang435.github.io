@@ -36,6 +36,7 @@
   --faint:     #8b9188;
   --accent:    #2c6e49;
   --accent-hi: #35875a;
+  --glow:      rgba(44,110,73,.30);
   --accent-bg: #ecf3ee;
   --on-accent: #ffffff;
   --shadow-sm: 0 1px 2px rgba(20,23,20,.05);
@@ -62,6 +63,7 @@ html[data-theme="dark"] {
   --faint:     #767d74;
   --accent:    #6cc48c;
   --accent-hi: #86d5a2;
+  --glow:      rgba(108,196,140,.5);
   --accent-bg: #17251c;
   --on-accent: #0e100f;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
@@ -97,6 +99,22 @@ body.lb-open { overflow: hidden; }
 img { max-width: 100%; display: block; }
 
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+/* a link sitting inside running text, where nothing else is clickable: the
+   glow is what says so before the cursor ever gets there */
+.lnk-glow {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-shadow: 0 0 8px var(--glow);
+  transition: color .25s var(--ease), text-shadow .25s var(--ease);
+}
+.lnk-glow:hover,
+.lnk-glow:focus-visible {
+  color: var(--accent-hi);
+  text-shadow: 0 0 12px var(--glow), 0 0 24px var(--glow);
+}
 
 ::selection { background: var(--accent); color: var(--on-accent); }
 
@@ -365,7 +383,11 @@ h1 {
   transition: opacity .35s var(--ease), transform .45s var(--spring);
 }
 
+/* the featured card drives the stack's height, and carries the same custom
+   properties as the deck so both animate into the grid the same way */
 .hero-shot {
+  --tx: 0px; --ty: 0px; --rot: 1.6deg; --sc: 1;
+  display: block;
   margin: 0;
   position: relative;
   z-index: 2;
@@ -373,17 +395,17 @@ h1 {
   overflow: hidden;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
-  transform: rotate(1.6deg);
-  transition: transform .55s var(--spring), box-shadow .45s var(--ease);
-  cursor: zoom-in;
+  transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--sc));
+  transition: transform .6s var(--spring), box-shadow .45s var(--ease), border-color .3s var(--ease);
 }
+.peek, .hero-shot { text-decoration: none; color: inherit; }
 .hero-shot .frame { position: relative; aspect-ratio: 3/4; overflow: hidden; }
 .hero-shot .frame img {
   width: 100%; height: 100%;
   object-fit: cover;
   transition: transform .7s var(--ease);
 }
-.hero-shot figcaption {
+.hero-cap {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   padding: 26px 16px 13px;
@@ -391,39 +413,57 @@ h1 {
   color: #fff;
   font-size: .78rem;
   line-height: 1.4;
+  transition: opacity .3s var(--ease);
 }
+/* the featured card's short label only appears once it is a grid tile */
+.hero-shot .peek-tag { z-index: 3; }
 
-/* the lift applies on any hover-capable device */
 @media (hover: hover) {
-  .hero-stack:hover .hero-shot { transform: rotate(0deg) scale(1.02); }
-  .hero-stack:hover .hero-shot .frame img { transform: scale(1.04); }
-}
+  /* hover or keyboard focus lays all four out as a 2x2: each card scales to
+     just under half and translates a quarter-box into its own quadrant */
+  .hero-stack:hover .peek,
+  .hero-stack:focus-within .peek { pointer-events: auto; z-index: 3; }
+  .hero-stack:hover .peek::after,
+  .hero-stack:focus-within .peek::after { opacity: 0; }
+  /* the tile scales to .485, and the label scales with it, so its type and
+     padding are pre-multiplied to land back at roughly 11px on screen */
+  .hero-stack:hover .peek-tag,
+  .hero-stack:focus-within .peek-tag {
+    opacity: 1;
+    transform: none;
+    font-size: 1.4rem;
+    padding: 8px 23px;
+    left: 21px; bottom: 21px;
+  }
+  .hero-stack:hover .hero-cap,
+  .hero-stack:focus-within .hero-cap { opacity: 0; }
 
-/* the full fan needs both a pointer and room to fan into */
-@media (hover: hover) and (min-width: 1080px) {
-  /* mostly downward travel: keeps the cards clear of the headline */
-  .hero-stack:hover .peek { pointer-events: auto; cursor: zoom-in; }
-  .hero-stack:hover .peek::after { opacity: .16; }
-  .hero-stack:hover .peek-tag { opacity: 1; transform: none; }
-  .hero-stack:hover .p1 { --tx: -44px;  --ty: 30px; --rot: -7deg;  --sc: .97; transition-delay: .02s; }
-  .hero-stack:hover .p2 { --tx: -84px;  --ty: 62px; --rot: -13deg; --sc: .93; transition-delay: .07s; }
-  .hero-stack:hover .p3 { --tx: -122px; --ty: 96px; --rot: -19deg; --sc: .89; transition-delay: .12s; }
+  .hero-stack:hover .hero-shot,
+  .hero-stack:focus-within .hero-shot { --tx: -25%; --ty: -25%; --rot: 0deg; --sc: .485; }
+  .hero-stack:hover .p1,
+  .hero-stack:focus-within .p1 { --tx: 25%;  --ty: -25%; --rot: 0deg; --sc: .485; transition-delay: .03s; }
+  .hero-stack:hover .p2,
+  .hero-stack:focus-within .p2 { --tx: -25%; --ty: 25%;  --rot: 0deg; --sc: .485; transition-delay: .06s; }
+  .hero-stack:hover .p3,
+  .hero-stack:focus-within .p3 { --tx: 25%;  --ty: 25%;  --rot: 0deg; --sc: .485; transition-delay: .09s; }
 
-  /* hovering a single card selects it: it comes to the front, straightens,
-     drops its scrim and takes an accent ring */
-  .hero-stack .peek:hover {
+  /* the tile under the cursor lifts out of the grid and takes an accent ring */
+  .hero-stack:hover .peek:hover,
+  .hero-stack:hover .hero-shot:hover,
+  .hero-stack .peek:focus-visible,
+  .hero-stack .hero-shot:focus-visible {
+    --sc: .52;
     z-index: 6;
-    --rot: -2deg;
-    --sc: 1.02;
     border-color: var(--accent);
     box-shadow: var(--shadow-lg);
     transition-delay: 0s;
   }
-  .hero-stack .peek:hover::after { opacity: 0; }
+}
 
-  /* while a card is selected, calm the main shot back down */
-  .hero-stack:has(.peek:hover) .hero-shot { transform: rotate(1.2deg) scale(1); }
-  .hero-stack:has(.peek:hover) .hero-shot .frame img { transform: none; }
+/* without hover the deck never fans, so the exposed edges have to be tappable */
+@media (hover: none) {
+  .peek { pointer-events: auto; }
+  .peek-tag { opacity: 1; transform: none; }
 }
 
 /* ============================================================
@@ -949,6 +989,13 @@ html[data-theme="dark"] .tags li { border-color: var(--border); }
   font-size: .62rem;
   letter-spacing: .06em;
   text-transform: uppercase;
+}
+/* the two pins sit at nearly the same height, so this one drops its label
+   below instead of racing the other one for horizontal room */
+.ab-pin.below span {
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 8px);
 }
 
 .ab-notes { margin: 16px 0 0; padding: 0; list-style: none; }
@@ -1479,7 +1526,7 @@ html.vt-back::view-transition-new(root) { z-index: 1; }
   .fv-cell .mono { margin-bottom: 0; }
   .fv-val { text-align: right; }
   .ab-stage { aspect-ratio: 4/3; }
-  .ab-pin span { left: auto; right: 20px; }
+  .ab-pin span { font-size: .58rem; padding: 2px 7px; }
 }
 
 @media (max-width: 430px) {
@@ -1498,6 +1545,8 @@ document.documentElement.className='js';
    on its way to the dark default */
 (function(){var s=null;try{s=localStorage.getItem("theme");}catch(e){}
 document.documentElement.setAttribute("data-theme",s||"dark");})();
+/* copy editor, only when asked for with #edit — visitors never fetch it */
+if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor.js";e.defer=true;document.head.appendChild(e);}
 </script>
 
 <!-- ══════ nav ══════ -->
@@ -1523,9 +1572,9 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 <header class="hero" id="top">
   <div class="wrap hero-grid">
     <div class="intro">
-      <span class="mono eyebrow">Biological Engineering · Purdue</span>
-      <h1>Charles&nbsp;Wang</h1>
-      <p class="hero-sub">
+      <span data-k="k1" class="mono eyebrow">Biological Engineering · Purdue</span>
+      <h1 data-k="k2">Charles&nbsp;Wang</h1>
+      <p data-k="k3" class="hero-sub">
         I've built four <strong>handheld leaf imaging
         instruments</strong>, from the CAD models down to the
         software that runs them.
@@ -1550,18 +1599,20 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       </div>
     </div>
 
+    <!-- a spread deck at rest, a 2x2 of all four devices on hover; each card
+         is a link into its own project -->
     <div class="hero-stack">
-      <!-- the other three devices sit behind as a spread deck; hovering fans them out -->
-      <span class="peek p3" aria-hidden="true"><img src="images/multispectral-cad-internal.webp" alt="" loading="lazy"><span class="peek-tag">Multispectral Imager</span></span>
-      <span class="peek p2" aria-hidden="true"><img src="images/fluoroscan-device.webp" alt="" loading="lazy"><span class="peek-tag">FluoroScan</span></span>
-      <span class="peek p1" aria-hidden="true"><img src="images/leafdoc-device.webp" alt="" loading="lazy"><span class="peek-tag">LeafDoc</span></span>
+      <a class="peek p3" href="#multispectral" aria-label="Jump to the Multispectral Handheld Imaging Device"><img src="images/multispectral-cad-internal.webp" alt="" loading="lazy"><span class="peek-tag" aria-hidden="true">Multispectral Imager</span></a>
+      <a class="peek p2" href="#fluoroscan" aria-label="Jump to FluoroScan"><img src="images/fluoroscan-device.webp" alt="" loading="lazy"><span class="peek-tag" aria-hidden="true">FluoroScan</span></a>
+      <a class="peek p1" href="#leafdoc" aria-label="Jump to LeafDoc"><img src="images/leafdoc-device.webp" alt="" loading="lazy"><span class="peek-tag" aria-hidden="true">LeafDoc</span></a>
 
-      <figure class="hero-shot" data-lb data-cap="Prototype 1 of the cross-section imager: the motorized clamp, rail and focusing drive built onto the lab's handheld leaf microscope">
+      <a class="hero-shot" href="#microscope" aria-label="Jump to the Leaf Cross-Section Microscope Imager">
         <div class="frame">
           <img src="images/microscope-hero.webp" width="900" height="1200" alt="The cross-section microscope imager: a handheld leaf microscope fitted with the motorized cross-section attachment">
         </div>
-        <figcaption>Cross-Section Imager &middot; the latest of four builds</figcaption>
-      </figure>
+        <span class="peek-tag" aria-hidden="true">Cross-Section Imager</span>
+        <span class="hero-cap" data-k="k4">Cross-Section Imager &middot; the latest of four builds</span>
+      </a>
     </div>
   </div>
 </header>
@@ -1569,45 +1620,39 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 <!-- ══════════════ stats ══════════════ -->
 <div class="stats">
   <div class="wrap stats-in">
-    <div class="stat"><b><span class="num" data-count="200" data-suffix="&times;">200&times;</span></b><span>Capture magnification<span class="stat-dev">Cross-Section Imager</span></span></div>
-    <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span>Lightbox build cost<span class="stat-dev">LeafDoc</span></span></div>
-    <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span>LEDs hand-soldered<span class="stat-dev">Multispectral Imager</span></span></div>
-    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span>Per-pixel resolution<span class="stat-dev">Multispectral Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="200" data-suffix="&times;">200&times;</span></b><span data-k="k5">Capture magnification<span class="stat-dev">Cross-Section Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="50" data-prefix="$">$50</span></b><span data-k="k6">Lightbox build cost<span class="stat-dev">LeafDoc</span></span></div>
+    <div class="stat"><b><span class="num" data-count="120" data-suffix="+">120+</span></b><span data-k="k7">LEDs hand-soldered<span class="stat-dev">Multispectral Imager</span></span></div>
+    <div class="stat"><b><span class="num" data-count="0.04" data-dec="2">0.04</span><small style="font-size:.5em;font-weight:500"> mm</small></b><span data-k="k8">Per-pixel resolution<span class="stat-dev">Multispectral Imager</span></span></div>
   </div>
 </div>
 
 <main>
 
 <!-- ══════════════ work ══════════════ -->
-<section id="work">
+<!-- no section header: the hero already says four instruments, CAD to software -->
+<section id="work" aria-label="Selected work">
   <div class="wrap">
-    <div class="sec-head narrow rv">
-      <span class="mono">Selected Work</span>
-      <h2>Four instruments I designed and built</h2>
-      <p>Each one started in SolidWorks and ended up working in the lab. I did
-         the mechanical design, the circuit assembly, and the software for all
-         four.</p>
-    </div>
 
     <!-- ─────── 01 Microscope Imager ─────── -->
     <article class="project rv" id="microscope">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 01 <b class="wip">In progress</b></span>
-          <h3>Leaf Cross-Section Microscope Imager</h3>
-          <p class="p-tagline">M.S. project, Purdue ABE Plant Sensor Lab &middot; Jan 2026 to present</p>
-          <p class="p-lead">
+          <span data-k="k12" class="mono p-num">Project 01 <b class="wip">In progress</b></span>
+          <h3 data-k="k13">Leaf Cross-Section Microscope Imager</h3>
+          <p data-k="k14" class="p-tagline">M.S. project, Purdue ABE Plant Sensor Lab &middot; Jan 2026 to present</p>
+          <p data-k="k15" class="p-lead">
             A modular attachment for the lab's handheld 400&times; leaf microscope that
             images a full corn-leaf cross section, so nitrogen status can be read
             from the leaf's internal structure.
           </p>
           <ul class="tags">
-            <li>Optics</li><li>Liquid Lens</li><li>Rack &amp; Pinion</li><li>Motor Control</li><li>Web Console</li><li>SolidWorks</li>
+            <li data-k="k16">Optics</li><li data-k="k17">Liquid Lens</li><li data-k="k18">Rack &amp; Pinion</li><li data-k="k19">Motor Control</li><li data-k="k20">Web Console</li><li data-k="k21">SolidWorks</li>
           </ul>
         </div>
         <figure class="p-vis" data-lb data-cap="The first prototype assembled on the handheld microscope, with the focusing drive, linear actuator and control electronics">
           <div class="frame"><img loading="lazy" src="images/microscope-p1-device.webp" width="1600" height="1067" alt="Side view of the full first prototype cross-section attachment on the handheld LeafSpec microscope"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Prototype 1, assembled</figcaption>
+          <figcaption data-k="k22">Prototype 1, assembled</figcaption>
         </figure>
       </div>
 
@@ -1617,33 +1662,33 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           <img src="images/microscope-strip-full.webp" width="2970" height="82" alt="" loading="lazy">
           <img src="images/microscope-strip-full.webp" width="2970" height="82" alt="" loading="lazy" aria-hidden="true">
         </div>
-        <p class="scan-label mono">One corn leaf, edge &rarr; midrib &middot; ~40 frames stitched &middot; captured by prototype 1</p>
+        <p data-k="k23" class="scan-label mono">One corn leaf, edge &rarr; midrib &middot; ~40 frames stitched &middot; captured by prototype 1</p>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">Problem</h4>
+          <h4 data-k="k24" class="mono">Problem</h4>
           <ul>
-            <li>The microscope sees one spot at a time, and its autofocus hunts for peak sharpness by stepping the leaf platform down a threaded-rod stage, taking <strong>about a minute per frame</strong>.</li>
-            <li>Play in the platform's guide rods tilts each shot slightly. That is negligible on a leaf surface, but enough to push a thin cross section out of the frame entirely.</li>
-            <li>Autofocus scores sharpness at the center of the view, and a cut corn leaf is rarely centered, so it often locks onto the empty stage instead of the leaf.</li>
+            <li data-k="k25">The microscope sees one spot at a time, and its autofocus hunts for peak sharpness by stepping the leaf platform down a threaded-rod stage, taking <strong>about a minute per frame</strong>.</li>
+            <li data-k="k26">Play in the platform's guide rods tilts each shot slightly. That is negligible on a leaf surface, but enough to push a thin cross section out of the frame entirely.</li>
+            <li data-k="k27">Autofocus scores sharpness at the center of the view, and a cut corn leaf is rarely centered, so it often locks onto the empty stage instead of the leaf.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Prototype 1 &middot; built</h4>
+          <h4 data-k="k28" class="mono">Prototype 1 &middot; built</h4>
           <ul>
-            <li>A <strong>3D-printed clamp on a motorized linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
-            <li>A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) adds live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
-            <li><strong>21 corn-leaf cross sections</strong> captured edge to midrib, each stitched from around 40 frames in a companion desktop app.</li>
-            <li>The catch: focusing each frame by hand took roughly 20 seconds, so one leaf took <strong>over 13 minutes</strong>.</li>
+            <li data-k="k29">A <strong>3D-printed clamp on a motorized linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
+            <li data-k="k30">A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) adds live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
+            <li data-k="k31"><strong>21 corn-leaf cross sections</strong> captured edge to midrib, each stitched from around 40 frames in a companion desktop app.</li>
+            <li data-k="k32">The catch: focusing each frame by hand took roughly 20 seconds, so one leaf took <strong>over 13 minutes</strong>.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Prototype 2 &middot; in progress</h4>
+          <h4 data-k="k33" class="mono">Prototype 2 &middot; in progress</h4>
           <ul>
-            <li>An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt no longer matters.</li>
-            <li>The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-center linear actuator whose overhung weight tilted the stage and let in stray light.</li>
-            <li>Target: a full cross-section scan in <strong>under 1 minute per leaf</strong>, down from 13.</li>
+            <li data-k="k34">An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt no longer matters.</li>
+            <li data-k="k35">The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-center linear actuator whose overhung weight tilted the stage and let in stray light.</li>
+            <li data-k="k36">Target: a full cross-section scan in <strong>under 1 minute per leaf</strong>, down from 13.</li>
           </ul>
         </div>
       </div>
@@ -1651,107 +1696,107 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       <div class="strip-compare">
         <div class="strip-row">
           <div class="strip-meta">
-            <span class="mono">100% nitrogen</span>
-            <span>Tall_TC_113 &middot; edge to midrib</span>
+            <span data-k="k37" class="mono">100% nitrogen</span>
+            <span data-k="k38">Tall_TC_113 &middot; edge to midrib</span>
           </div>
           <div class="strip-scroll"><img src="images/microscope-strip-100n.webp" width="2820" height="52" alt="Stitched microscope cross section of a corn leaf grown at the full nitrogen rate" loading="lazy"></div>
         </div>
         <div class="strip-row">
           <div class="strip-meta">
-            <span class="mono">0% nitrogen</span>
-            <span>Tall_TC_112 &middot; edge to midrib</span>
+            <span data-k="k39" class="mono">0% nitrogen</span>
+            <span data-k="k40">Tall_TC_112 &middot; edge to midrib</span>
           </div>
           <div class="strip-scroll"><img src="images/microscope-strip-0n.webp" width="2805" height="48" alt="Stitched microscope cross section of a corn leaf grown with no nitrogen fertilizer" loading="lazy"></div>
         </div>
         <div class="strip-slider">
-          <span class="mono">Edge</span>
+          <span data-k="k41" class="mono">Edge</span>
           <input type="range" id="stripRange" min="0" max="1000" value="0" aria-label="Pan both strips along the leaf, from edge to midrib">
-          <span class="mono">Midrib</span>
+          <span data-k="k42" class="mono">Midrib</span>
         </div>
-        <p class="strip-hint mono">Drag the slider to pan both leaves at once, the way the rail walks them under the lens</p>
+        <p data-k="k43" class="strip-hint mono">Drag the slider to pan both leaves at once, the way the rail walks them under the lens</p>
       </div>
 
       <div class="gallery stg">
         <figure class="shot dark" data-lb data-cap="The lab's original handheld leaf microscope, built by a previous lab member. The cross-section attachment builds on this platform.">
           <div class="frame"><img loading="lazy" src="images/microscope-original-device.webp" width="348" height="280" alt="Labelled photo of the original handheld leaf microscope showing the optical system, focusing mechanism, leaf clamp and embedded control unit"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>The original microscope</figcaption>
+          <figcaption data-k="k44">The original microscope</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Cutaway of the original optical path, from the LED source through the objective up to the camera sensor">
           <div class="frame"><img loading="lazy" src="images/microscope-original-optics.webp" width="918" height="555" alt="CAD cutaway of the handheld microscope showing the illumination and imaging path through the objective to the camera"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Original optical path</figcaption>
+          <figcaption data-k="k45">Original optical path</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="The original focusing drive: one servo spins two threaded rods through bevel gears to raise the leaf platform. The play in this stage is what made cross-section autofocus unusable.">
           <div class="frame"><img loading="lazy" src="images/microscope-focus-gears.webp" width="356" height="220" alt="CAD render of the focusing mechanism with a servo motor driving two threaded rods through bevel gears"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Original focusing drive</figcaption>
+          <figcaption data-k="k46">Original focusing drive</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="Prototype 1: the cross-section clamp rides a linear rail beneath the objective, stepping the cut leaf sideways 0.75 mm per frame">
           <div class="frame"><img loading="lazy" src="images/microscope-p1-front.webp" width="1600" height="1067" alt="Close-up of the first prototype with the objective lens above the black cross-section clamp and linear rail"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Prototype 1 clamp and rail</figcaption>
+          <figcaption data-k="k47">Prototype 1 clamp and rail</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="The rail's motor hangs off one side and needs its own external driver. That imbalance tilted the stage and let stray light into the frames.">
           <div class="frame"><img loading="lazy" src="images/microscope-p1-back.webp" width="1600" height="1067" alt="Back view of the first prototype showing the side-mounted motor, external driver box and wiring"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Prototype 1 from the back</figcaption>
+          <figcaption data-k="k48">Prototype 1 from the back</figcaption>
         </figure>
         <figure class="shot dark" data-lb data-cap="21 corn-leaf cross sections captured with prototype 1, each stitched from around 40 frames, arranged by field replicate. Every strip runs edge to midrib.">
           <div class="frame"><img loading="lazy" src="images/microscope-sections-replicates.webp" width="2200" height="1216" alt="Composite of 21 stitched corn leaf cross-section strips arranged in three replicate groups"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>21 stitched cross sections</figcaption>
+          <figcaption data-k="k49">21 stitched cross sections</figcaption>
         </figure>
         <figure class="shot dark" data-lb data-cap="The same strips grouped by nitrogen treatment, from 0% up to 133%. The structural differences across treatments are what the imaging is after.">
           <div class="frame"><img loading="lazy" src="images/microscope-sections-nitrogen.webp" width="2200" height="1216" alt="Composite of stitched cross-section strips ordered by nitrogen treatment from low to high"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Grouped by nitrogen rate</figcaption>
+          <figcaption data-k="k50">Grouped by nitrogen rate</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="Prototype 2 in progress: the liquid lens is fitted into the optical path, and the rack-and-pinion parts for the new horizontal stage are laid out below">
           <div class="frame"><img loading="lazy" src="images/microscope-p2-liquid-lens.webp" width="1600" height="1067" alt="Disassembled second prototype on a cutting mat with the liquid lens annotated and rack and pinion parts laid out"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Prototype 2 &middot; liquid lens</figcaption>
+          <figcaption data-k="k51">Prototype 2 &middot; liquid lens</figcaption>
         </figure>
       </div>
     </article>
 
     <!-- ─────── 02 LeafDoc ─────── -->
-    <article class="project rv">
+    <article class="project rv" id="leafdoc">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 02</span>
-          <h3>LeafDoc</h3>
-          <p class="p-tagline">Smartphone plant imaging system with in-app AI diagnosis</p>
-          <p class="p-lead">
+          <span data-k="k52" class="mono p-num">Project 02</span>
+          <h3 data-k="k53">LeafDoc</h3>
+          <p data-k="k54" class="p-tagline">Smartphone plant imaging system with in-app AI diagnosis</p>
+          <p data-k="k55" class="p-lead">
             A $50 handheld lightbox that blocks ambient light and lights the leaf
             evenly. A phone snaps onto the top surface, ready to image through
             the LeafDoc app &mdash; turning an ordinary smartphone into a
             repeatable imaging rig.
           </p>
           <ul class="tags">
-            <li>SolidWorks</li><li>Kotlin</li><li>CameraX</li><li>Image Stitching</li><li>3D Printing</li>
+            <li data-k="k56">SolidWorks</li><li data-k="k57">Kotlin</li><li data-k="k58">CameraX</li><li data-k="k59">Image Stitching</li><li data-k="k60">3D Printing</li>
           </ul>
         </div>
         <figure class="p-vis" data-lb data-cap="The assembled LeafDoc lightbox, with a smartphone locked in place above the sample">
           <div class="frame"><img loading="lazy" src="images/leafdoc-device.webp" width="900" height="1199" alt="The LeafDoc handheld lightbox with a smartphone mounted on top, showing captured leaf images"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>The assembled device</figcaption>
+          <figcaption data-k="k61">The assembled device</figcaption>
         </figure>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">Problem</h4>
+          <h4 data-k="k62" class="mono">Problem</h4>
           <ul>
-            <li>Ambient light makes phone-captured leaf images inconsistent and hard to compare.</li>
-            <li>Holding a leaf by hand introduces curl, shadow, and framing variation on every shot.</li>
+            <li data-k="k63">Ambient light makes phone-captured leaf images inconsistent and hard to compare.</li>
+            <li data-k="k64">Holding a leaf by hand introduces curl, shadow, and framing variation on every shot.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">What I built</h4>
+          <h4 data-k="k65" class="mono">What I built</h4>
           <ul>
-            <li><strong>Contoured rollers</strong> flatten and center the leaf as it enters, so the positioning repeats without any manual adjustment.</li>
-            <li><strong>MagSafe mounting</strong> locks the phone in a fixed position above the sample.</li>
-            <li><strong>Seven enclosure revisions</strong> in SolidWorks, each one printed to test light leak, roller clearance, and component fit.</li>
-            <li>A <strong>native Android app</strong> in Kotlin and CameraX, with manual camera control and an alignment stitching algorithm.</li>
+            <li data-k="k66"><strong>Contoured rollers</strong> flatten and center the leaf as it enters, so the positioning repeats without any manual adjustment.</li>
+            <li data-k="k67"><strong>MagSafe mounting</strong> locks the phone in a fixed position above the sample.</li>
+            <li data-k="k68"><strong>Seven enclosure revisions</strong> in SolidWorks, each one printed to test light leak, roller clearance, and component fit.</li>
+            <li data-k="k69">A <strong>native Android app</strong> in Kotlin and CameraX, with manual camera control and an alignment stitching algorithm.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Result</h4>
+          <h4 data-k="k70" class="mono">Result</h4>
           <ul>
-            <li>Overlapping frames assemble into a single full-length leaf image automatically.</li>
-            <li>Cloud AI returns a <strong>health score, primary finding, and confidence level</strong> inside the app, with no export step or outside tools.</li>
+            <li data-k="k71">Overlapping frames assemble into a single full-length leaf image automatically.</li>
+            <li data-k="k72">Cloud AI returns a <strong>health score, primary finding, and confidence level</strong> inside the app, with no export step or outside tools.</li>
           </ul>
         </div>
       </div>
@@ -1759,76 +1804,76 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       <div class="gallery stg">
         <figure class="shot" data-lb data-cap="Seven enclosure revisions, each printed to test light leak, roller clearance, and component fit">
           <div class="frame"><img loading="lazy" src="images/leafdoc-revisions.webp" width="1044" height="420" alt="Seven 3D-printed enclosure revisions lined up on a workbench"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Seven printed revisions</figcaption>
+          <figcaption data-k="k73">Seven printed revisions</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="SolidWorks model showing how the contoured rollers guide and flatten the leaf as it enters">
           <div class="frame"><img loading="lazy" src="images/leafdoc-cad.webp" width="722" height="352" alt="SolidWorks render of the LeafDoc lightbox with a leaf entering the rollers"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>CAD model &amp; roller geometry</figcaption>
+          <figcaption data-k="k74">CAD model &amp; roller geometry</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Overlapping frames stitched into one continuous full-length corn leaf image">
           <div class="frame"><img loading="lazy" src="images/leafdoc-stitched.webp" width="585" height="152" alt="A stitched composite image of a full corn leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Stitched corn leaf output</figcaption>
+          <figcaption data-k="k75">Stitched corn leaf output</figcaption>
         </figure>
         <figure class="shot tall" data-lb data-cap="Capture view, with manual camera controls and live segment tracking">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-capture.webp" width="274" height="608" alt="Android app capture screen showing a leaf and shutter button"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Capture screen</figcaption>
+          <figcaption data-k="k76">Capture screen</figcaption>
         </figure>
         <figure class="shot tall" data-lb data-cap="Session management, with captured frames, per-frame alignment editing, and capture metadata">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-frames.webp" width="324" height="720" alt="Android app screen listing individual captured frames and session details"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Sessions and alignment</figcaption>
+          <figcaption data-k="k77">Sessions and alignment</figcaption>
         </figure>
         <figure class="shot tall" data-lb data-cap="AI diagnosis, showing health score, leaf description, primary finding, and confidence level">
           <div class="frame"><img loading="lazy" src="images/leafdoc-app-ai.webp" width="432" height="960" alt="Android app screen showing an AI diagnosis with health score and recommendations"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>AI diagnosis screen</figcaption>
+          <figcaption data-k="k78">AI diagnosis screen</figcaption>
         </figure>
       </div>
     </article>
 
     <!-- ─────── 03 FluoroScan ─────── -->
-    <article class="project rv">
+    <article class="project rv" id="fluoroscan">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 03</span>
-          <h3>FluoroScan</h3>
-          <p class="p-tagline">Portable photosynthetic efficiency imaging system</p>
-          <p class="p-lead">
-            A low-cost imager built to measure photosynthetic efficiency directly
-            and non-invasively through chlorophyll fluorescence, so plant stress
-            could be caught before it is visible.
+          <span data-k="k79" class="mono p-num">Project 03</span>
+          <h3 data-k="k80">FluoroScan</h3>
+          <p data-k="k81" class="p-tagline">Portable photosynthetic efficiency imaging system</p>
+          <p data-k="k82" class="p-lead">
+            Under $2,000 in parts, built to measure photosynthetic efficiency
+            directly and non-invasively through chlorophyll fluorescence, so plant
+            stress could be caught before it is visible.
           </p>
           <ul class="tags">
-            <li>Raspberry Pi</li><li>SolidWorks</li><li>Optics</li><li>LED Arrays</li><li>Fluorescence</li>
+            <li data-k="k83">Raspberry Pi</li><li data-k="k84">SolidWorks</li><li data-k="k85">Optics</li><li data-k="k86">LED Arrays</li><li data-k="k87">Fluorescence</li>
           </ul>
         </div>
         <figure class="p-vis" data-lb data-cap="The assembled FluoroScan enclosure with the camera mounted above the sample chamber">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-device.webp" width="345" height="311" alt="Black 3D-printed FluoroScan enclosure with a camera module on top"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Assembled enclosure</figcaption>
+          <figcaption data-k="k88">Assembled enclosure</figcaption>
         </figure>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">The physics</h4>
+          <h4 data-k="k89" class="mono">The physics</h4>
           <ul>
-            <li>After dark adaptation every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
-            <li>A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
-            <li>The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
+            <li data-k="k90">After dark adaptation &mdash; overnight, covered, in a dark room &mdash; every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
+            <li data-k="k91">A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
+            <li data-k="k92">The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">What I built</h4>
+          <h4 data-k="k93" class="mono">What I built</h4>
           <ul>
-            <li>Prototyped in SolidWorks and printed on Bambu Lab hardware.</li>
-            <li>A Raspberry Pi handles camera and system control.</li>
-            <li><strong>450 nm excitation</strong> at 4000 µmol m⁻² s⁻¹ from 12 LEDs in a 3-up configuration on an angled mount.</li>
-            <li>Emission captured through a <strong>680/720 nm</strong> filter after dark adaptation.</li>
+            <li data-k="k94"><strong>Twelve 450 nm LEDs</strong> on hand-soldered star boards, angled 3-up at the sample plane so the whole leaf lights evenly.</li>
+            <li data-k="k95"><strong>4000 µmol m⁻² s⁻¹</strong> at the sample, the calculated target for closing every PSII centre at once &mdash; designed, not yet measured.</li>
+            <li data-k="k96">A <strong>680/720 nm</strong> bandpass that passes the fluorescence and rejects the far brighter excitation.</li>
+            <li data-k="k97"><strong>One timed sequence</strong> fires the flash and trips the shutter, so the frame lands while the centres are still closed.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">The goal</h4>
+          <h4 data-k="k98" class="mono">The goal</h4>
           <ul>
-            <li>Real-time imaging that flags stress before it shows up to the eye.</li>
-            <li>A build cost low enough that a lab without a commercial fluorometer can still take the measurement.</li>
+            <li data-k="k99">Real-time imaging that flags stress before it shows up to the eye.</li>
+            <li data-k="k100">A build cost low enough that a lab without a commercial fluorometer can still take the measurement. The camera, lens and emission filter are most of the bill.</li>
           </ul>
         </div>
       </div>
@@ -1836,8 +1881,8 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       <!-- the measurement the optics are built around, drawn out -->
       <div class="panel" id="fvfm">
         <div class="panel-head">
-          <span class="mono">The measurement</span>
-          <p>Run the pulse, then drag the leaf from healthy toward stressed</p>
+          <span data-k="k101" class="mono">The measurement</span>
+          <p data-k="k102">Run the pulse, then drag the leaf from healthy toward stressed</p>
         </div>
 
         <div class="fvfm-stage">
@@ -1890,28 +1935,28 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
             <span>Run measurement</span>
           </button>
           <div class="fv-slider">
-            <span class="mono">Healthy</span>
+            <span data-k="k103" class="mono">Healthy</span>
             <input type="range" id="fvStress" min="0" max="100" value="0" aria-label="Leaf condition, from healthy to photoinhibited">
-            <span class="mono">Stressed</span>
+            <span data-k="k104" class="mono">Stressed</span>
           </div>
         </div>
 
         <div class="fv-read">
           <div class="fv-cell">
-            <span class="mono">F<sub>o</sub> &middot; baseline</span>
-            <div class="fv-val"><b id="fvOutF0">0.20</b><small>PSII centres open</small></div>
+            <span data-k="k105" class="mono">F<sub>o</sub> &middot; baseline</span>
+            <div class="fv-val"><b id="fvOutF0">0.20</b><small data-k="k106">PSII centres open</small></div>
           </div>
           <div class="fv-cell">
-            <span class="mono">F<sub>m</sub> &middot; maximum</span>
-            <div class="fv-val"><b id="fvOutFm">1.18</b><small>PSII centres closed</small></div>
+            <span data-k="k107" class="mono">F<sub>m</sub> &middot; maximum</span>
+            <div class="fv-val"><b id="fvOutFm">1.18</b><small data-k="k108">PSII centres closed</small></div>
           </div>
           <div class="fv-cell key">
-            <span class="mono">F<sub>v</sub> / F<sub>m</sub></span>
+            <span data-k="k109" class="mono">F<sub>v</sub> / F<sub>m</sub></span>
             <div class="fv-val"><b id="fvOutR">0.831</b><small id="fvOutNote">healthy dark-adapted range</small></div>
           </div>
         </div>
 
-        <p class="panel-note">
+        <p data-k="k110" class="panel-note">
           An illustration of the measurement principle, on published F<sub>v</sub>/F<sub>m</sub> values
           &mdash; not FluoroScan output. The instrument is a prototype and has not been validated
           against a commercial fluorometer.
@@ -1921,79 +1966,79 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       <div class="gallery stg">
         <figure class="shot" data-lb data-cap="Twelve 450 nm LEDs wired in a 3-up ring around the imaging aperture">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-leds.webp" width="302" height="270" alt="Circular LED array with twelve LEDs wired in red and blue"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>12-LED excitation ring</figcaption>
+          <figcaption data-k="k111">12-LED excitation ring</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="A single LED star board, soldered and labeled before installation into the ring">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-led-board.webp" width="247" height="214" alt="Hand holding a soldered LED star board with yellow and blue wires"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>LED board detail</figcaption>
+          <figcaption data-k="k112">LED board detail</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="SolidWorks model of the angled mount that aims the LED array at the sample plane">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-cad.webp" width="434" height="218" alt="CAD render of the angled dodecagonal LED mounting plate"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Angled LED mount (CAD)</figcaption>
+          <figcaption data-k="k113">Angled LED mount (CAD)</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="A dark-adapted leaf held flat in the sample tray, ready for imaging">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-holder.webp" width="327" height="280" alt="A leaf pressed flat under glass in the sample holder"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Sample holder</figcaption>
+          <figcaption data-k="k114">Sample holder</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Control sample, with the RGB image beside the corresponding fluorescence capture">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-control.webp" width="538" height="218" alt="Side by side RGB and fluorescence images of a control leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Control sample</figcaption>
+          <figcaption data-k="k115">Control sample</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Test sample, with the RGB image beside the corresponding fluorescence capture">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-stressed.webp" width="422" height="166" alt="Side by side RGB and fluorescence images of a damaged leaf"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Test sample</figcaption>
+          <figcaption data-k="k116">Test sample</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="PSII fluorescence emission spectra, which set the choice of a 680/720 nm filter">
           <div class="frame"><img loading="lazy" src="images/fluoroscan-spectra.webp" width="337" height="287" alt="Line chart of PSII fluorescence emission spectra by wavelength"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>PSII emission spectra</figcaption>
+          <figcaption data-k="k117">PSII emission spectra</figcaption>
         </figure>
       </div>
     </article>
 
     <!-- ─────── 04 Multispectral ─────── -->
-    <article class="project rv">
+    <article class="project rv" id="multispectral">
       <div class="p-head">
         <div>
-          <span class="mono p-num">Project 04</span>
-          <h3>Multispectral Handheld Imaging Device</h3>
-          <p class="p-tagline">Field-portable plant phenotyping instrument</p>
-          <p class="p-lead">
+          <span data-k="k118" class="mono p-num">Project 04</span>
+          <h3 data-k="k119">Multispectral Handheld Imaging Device</h3>
+          <p data-k="k120" class="p-tagline">Field-portable plant phenotyping instrument</p>
+          <p data-k="k121" class="p-lead">
             A phenotyping device that captures leaf detail at 0.04 mm/pixel across
             six wavelength bands. I redesigned it so that every component fits
             inside the enclosure.
           </p>
           <ul class="tags">
-            <li>Raspberry Pi</li><li>Electronics</li><li>MOSFET Switching</li><li>Reverse Engineering</li><li>SolidWorks</li>
+            <li data-k="k122">Raspberry Pi</li><li data-k="k123">Electronics</li><li data-k="k124">MOSFET Switching</li><li data-k="k125">Reverse Engineering</li><li data-k="k126">SolidWorks</li>
           </ul>
         </div>
         <figure class="p-vis pad" data-lb data-cap="Ghosted CAD view of the redesigned enclosure, with the Raspberry Pi and all electronics inside">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Transparent CAD render showing internal Raspberry Pi and electronics layout"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Redesigned enclosure (CAD)</figcaption>
+          <figcaption data-k="k127">Redesigned enclosure (CAD)</figcaption>
         </figure>
       </div>
 
       <div class="details">
         <div>
-          <h4 class="mono">Problem</h4>
+          <h4 data-k="k128" class="mono">Problem</h4>
           <ul>
-            <li>The original kept the Raspberry Pi in an external housing, with wiring running outside the body.</li>
-            <li>None of it was documented, so every subsystem had to be traced before anything could change.</li>
+            <li data-k="k129">The original kept the Raspberry Pi in an external housing, with wiring running outside the body.</li>
+            <li data-k="k130">None of it was documented, so every subsystem had to be traced before anything could change.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">What I built</h4>
+          <h4 data-k="k131" class="mono">What I built</h4>
           <ul>
-            <li><strong>Reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure so all the electronics sit inside it.</li>
-            <li><strong>120+ LEDs</strong> hand-soldered across 6 wavelength bands.</li>
-            <li>MOSFET switching with 12V/5V power conversion.</li>
-            <li>Raspberry Pi for camera control and capture sequencing.</li>
+            <li data-k="k132"><strong>Reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure so all the electronics sit inside it.</li>
+            <li data-k="k133"><strong>120+ LEDs</strong> hand-soldered across 6 wavelength bands.</li>
+            <li data-k="k134">MOSFET switching with 12V/5V power conversion.</li>
+            <li data-k="k135">Raspberry Pi for camera control and capture sequencing.</li>
           </ul>
         </div>
         <div>
-          <h4 class="mono">Result</h4>
+          <h4 data-k="k136" class="mono">Result</h4>
           <ul>
-            <li>A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
-            <li>Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication I co-authored.</li>
+            <li data-k="k137">A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
+            <li data-k="k138">Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication I co-authored.</li>
           </ul>
         </div>
       </div>
@@ -2002,10 +2047,10 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
       <div class="panel" id="encl">
         <div class="panel-head">
           <div class="ab-tabs" role="tablist" aria-label="Enclosure design">
-            <button class="ab-tab" id="abTabA" type="button" role="tab" aria-selected="false" aria-controls="abViewA">Original</button>
-            <button class="ab-tab" id="abTabB" type="button" role="tab" aria-selected="true" aria-controls="abViewB">My redesign</button>
+            <button data-k="k139" class="ab-tab" id="abTabA" type="button" role="tab" aria-selected="false" aria-controls="abViewA">Original</button>
+            <button data-k="k140" class="ab-tab" id="abTabB" type="button" role="tab" aria-selected="true" aria-controls="abViewB">My redesign</button>
           </div>
-          <p>Switch between the two builds</p>
+          <p data-k="k141">Switch between the two builds</p>
         </div>
 
         <div class="ab-stage">
@@ -2017,30 +2062,40 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           <div class="ab-view on" id="abViewB" role="tabpanel" aria-labelledby="abTabB">
             <div class="ab-img" style="aspect-ratio: 463/371">
               <img loading="lazy" src="images/multispectral-cad-internal.webp" width="463" height="371" alt="Ghosted CAD render of the redesigned enclosure with the Raspberry Pi mounted on the inner wall">
-              <span class="ab-pin" style="left: 17.3%; top: 41%"><span>Raspberry Pi</span></span>
+              <span data-k="k142" class="ab-pin" style="left: 17.3%; top: 41%"><span>Raspberry Pi</span></span>
+              <span data-k="k143" class="ab-pin below" style="left: 46%; top: 44.3%"><span>Buck converter</span></span>
             </div>
           </div>
         </div>
 
-        <ul class="ab-notes" id="abNotes"></ul>
+        <ul class="ab-notes" id="abNotesA" hidden>
+          <li data-k="k144">Raspberry Pi in an <strong>external housing</strong>, hung off the body</li>
+          <li data-k="k145">Wiring <strong>ran outside the enclosure</strong>, between the head and the controller</li>
+          <li data-k="k146"><strong>Nothing documented</strong> &mdash; every subsystem had to be traced before it could change</li>
+        </ul>
+        <ul class="ab-notes" id="abNotesB">
+          <li data-k="k147" class="good"><strong>Raspberry Pi mounted on the inner wall</strong>, inside the shell</li>
+          <li data-k="k148" class="good"><strong>All electronics internal</strong>, MOSFET switching and the 12V&rarr;5V buck converter included</li>
+          <li data-k="k149" class="good"><strong>Every subsystem reverse-engineered and documented</strong> before the rebuild</li>
+        </ul>
       </div>
 
       <div class="gallery stg">
         <figure class="shot pad" data-lb data-cap="The original device design, with the Raspberry Pi in an external housing and wiring running outside the body">
           <div class="frame"><img loading="lazy" src="images/multispectral-cad.webp" width="361" height="380" alt="CAD render of the original handheld multispectral imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Original design (CAD)</figcaption>
+          <figcaption data-k="k150">Original design (CAD)</figcaption>
         </figure>
         <figure class="shot" data-lb data-cap="A leaf captured at 0.04 mm/pixel with ambient light fully blocked, resolving the secondary veins">
           <div class="frame"><img loading="lazy" src="images/multispectral-capture.webp" width="405" height="251" alt="High-resolution multispectral capture of a leaf against a bright background"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Capture at 0.04 mm/pixel</figcaption>
+          <figcaption data-k="k151">Capture at 0.04 mm/pixel</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="Treatment time series across 2,4-D, Dicamba, and untreated control samples">
           <div class="frame"><img loading="lazy" src="images/multispectral-timeseries.webp" width="417" height="238" alt="Grid of false-color leaf images across treatments and time points"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Treatment time series</figcaption>
+          <figcaption data-k="k152">Treatment time series</figcaption>
         </figure>
         <figure class="shot pad" data-lb data-cap="LeafSpec research poster from the Institute for Digital Forestry at Purdue University">
           <div class="frame"><img loading="lazy" src="images/multispectral-poster.webp" width="606" height="455" alt="Research poster describing the LeafSpec multispectral handheld imaging device"><span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div>
-          <figcaption>Research poster</figcaption>
+          <figcaption data-k="k153">Research poster</figcaption>
         </figure>
       </div>
     </article>
@@ -2051,63 +2106,63 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 <section id="experience">
   <div class="wrap">
     <div class="sec-head narrow rv">
-      <span class="mono">Experience</span>
-      <h2>Where I have done this work</h2>
-      <p>Both roles are in Purdue's ABE Plant Sensor Lab, building instruments that
+      <span data-k="k154" class="mono">Experience</span>
+      <h2 data-k="k155">Where I have done this work</h2>
+      <p data-k="k156">Both roles are in Purdue's ABE Plant Sensor Lab, building instruments that
          plant scientists and breeders actually take into the field.</p>
     </div>
 
     <div class="timeline rv">
       <div class="tl-item">
         <div class="tl-head">
-          <h3>Product Engineer</h3>
-          <span class="tl-date mono">May 2024 &ndash; Present</span>
+          <h3 data-k="k157">Hardware Engineer</h3>
+          <span data-k="k158" class="tl-date mono">May 2024 &ndash; Present</span>
         </div>
-        <p class="tl-org">LeafSpec LLC &middot; Purdue ABE Plant Sensor Lab</p>
-        <p class="tl-note">A Purdue startup building handheld hyperspectral leaf imagers for plant scientists and breeders.</p>
+        <p data-k="k159" class="tl-org">LeafSpec LLC &middot; Purdue ABE Plant Sensor Lab</p>
+        <p data-k="k160" class="tl-note">A Purdue ag-tech startup (Prof. Jian Jin) commercialising handheld leaf imagers for farmers and researchers.</p>
         <ul>
-          <li>Design and build handheld plant-imaging instruments: mechanical design in SolidWorks, FDM 3D printing, and integration of microcontrollers, motors, LED lighting and cameras into working prototypes.</li>
-          <li>Collected the hyperspectral and multispectral leaf data for a <strong>peer-reviewed study on herbicide crop injury</strong>. That dataset trained machine learning models that reached 90% classification accuracy.</li>
-          <li>Work directly with agronomy and weed science researchers to define device requirements, including corn leaf scans in under 10 seconds and GPS/GIS tagging that maps each scan to its field location.</li>
+          <li data-k="k161">Engineer handheld crop-imaging instruments from concept to field deployment: enclosures and mechanisms in SolidWorks, 3D-printed prototypes, and cameras, LED illumination, motors and microcontrollers integrated into devices plant researchers use daily.</li>
+          <li data-k="k162">Build the software that runs each instrument alongside the hardware &mdash; web control consoles, Android apps, and LLM-based analysis that flags plant stress and disease from leaf images.</li>
+          <li data-k="k163">LeafDoc capture hardware supports a <strong>Purdue&ndash;DARPA project using plants as chemical sentinels</strong>, and lab imagers are in use by partners including <strong>Corteva</strong>.</li>
         </ul>
       </div>
 
       <div class="tl-item">
         <div class="tl-head">
-          <h3>Undergraduate Summer Researcher</h3>
-          <span class="tl-date mono">May &ndash; Jul 2024</span>
+          <h3 data-k="k164">Summer Research Fellow</h3>
+          <span data-k="k165" class="tl-date mono">May &ndash; Jul 2024</span>
         </div>
-        <p class="tl-org">Institute for Digital Forestry, Purdue University</p>
-        <p class="tl-note">Paid summer research program, placed in the ABE Plant Sensor Lab.</p>
+        <p data-k="k166" class="tl-org">Institute for Digital Forestry, Purdue University</p>
+        <p data-k="k167" class="tl-note">Paid summer research program, placed in the ABE Plant Sensor Lab.</p>
         <ul>
-          <li>Rebuilt an undocumented multispectral leaf imager (UV to IR) from legacy SolidWorks files alone: reverse-engineered the assembly, 3D-printed the parts, and wired the camera, microcontroller and drive electronics.</li>
-          <li>Redesigned the top enclosure so the microcontroller and driver board sit inside the main housing, replacing an external tethered box and <strong>cutting total device volume by roughly 30%</strong>.</li>
-          <li>Verified image quality with a 0.04 mm/pixel camera that resolves individual leaf veins.</li>
+          <li data-k="k168">Rebuilt the lab's undocumented <strong>LeafSpec-Multi</strong> multispectral imager from its SolidWorks assembly alone: tore down the legacy unit to learn how it worked, 3D-printed every part, and rebuilt the complete device.</li>
+          <li data-k="k169">Hand-soldered a <strong>120+ LED illumination board</strong> across 6 wavelength bands, visible and IR, with MOSFET drivers per band on Raspberry Pi GPIO and a 12&nbsp;V&rarr;5&nbsp;V converter.</li>
+          <li data-k="k170">Designed a new top enclosure that moved the Pi, driver board and converter from an external tethered box into the device body &mdash; <strong>~30% smaller</strong> and genuinely handheld &mdash; and added GPS/GIS geo-referenced capture through the app.</li>
         </ul>
       </div>
     </div>
 
     <div class="cred rv">
       <div class="cred-col">
-        <h3 class="mono">Education</h3>
+        <h3 data-k="k171" class="mono">Education</h3>
         <div class="cred-item">
-          <b>M.S., Agricultural &amp; Biological Engineering</b>
-          <span>Purdue University &middot; expected May 2027</span>
+          <b data-k="k172">M.S., Agricultural &amp; Biological Engineering</b>
+          <span data-k="k173">Purdue University &middot; expected May 2027</span>
         </div>
         <div class="cred-item">
-          <b>B.S., Biological Engineering</b>
-          <span>Purdue University &middot; December 2025 &middot; GPA 3.63</span>
+          <b data-k="k174">B.S., Biological Engineering</b>
+          <span data-k="k175">Purdue University &middot; December 2025 &middot; GPA 3.63</span>
         </div>
       </div>
       <div class="cred-col">
-        <h3 class="mono">Honors &amp; leadership</h3>
+        <h3 data-k="k176" class="mono">Honors &amp; leadership</h3>
         <div class="cred-item">
-          <b>Top 10, Indiana Soybean Innovation Competition</b>
-          <span>2024 &middot; co-created Soysheets, a combined detergent and dryer sheet that is 67% soy</span>
+          <b data-k="k177">Top 10, Indiana Soybean Innovation Competition</b>
+          <span data-k="k178">2024 &middot; co-created <a class="lnk-glow" href="https://engineering.purdue.edu/ABE/academics/competitions/past_teams_and_products#year-2023-2024-team-soy-sheets-name" target="_blank" rel="noopener">Soysheets</a>, a combined detergent and dryer sheet that is 67% soy</span>
         </div>
         <div class="cred-item">
-          <b>Executive Board, Assoc. of Hip Hop Practitioners &amp; Scholars</b>
-          <span>2021 to present &middot; raised $80,000 through the "Hip Hop, the Next Giant Leap" fundraiser</span>
+          <b data-k="k179">Executive Board, Assoc. of Hip Hop Practitioners &amp; Scholars</b>
+          <span data-k="k180">2021 to present &middot; raised $80,000 through the "Hip Hop, the Next Giant Leap" fundraiser</span>
         </div>
       </div>
     </div>
@@ -2118,9 +2173,9 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 <section id="skills">
   <div class="wrap">
     <div class="sec-head narrow rv">
-      <span class="mono">Skills</span>
-      <h2>What I work with</h2>
-      <p>Everything here came out of building the four instruments above.</p>
+      <span data-k="k181" class="mono">Skills</span>
+      <h2 data-k="k182">What I work with</h2>
+      <p data-k="k183">Everything here came out of building the four instruments above.</p>
     </div>
     <div class="skillset rv">
 
@@ -2130,7 +2185,7 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           Design &amp; Fabrication
         </h3>
         <ul class="chips">
-          <li>SolidWorks</li><li>3D Printing</li><li>Bambu Lab</li><li>Enclosure Design</li><li>Optical Path Layout</li>
+          <li data-k="k184">SolidWorks</li><li data-k="k185">3D Printing + Bambu Lab</li><li data-k="k186">Enclosure Design</li><li data-k="k187">Optical Path Layout</li>
         </ul>
       </div>
 
@@ -2140,7 +2195,7 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           Electronics
         </h3>
         <ul class="chips">
-          <li>LED Arrays</li><li>Hand Soldering</li><li>MOSFET Switching</li><li>12V/5V Power</li><li>Raspberry Pi</li><li>Motor Control</li><li>Microcontrollers</li>
+          <li data-k="k189">Hand Soldering</li><li data-k="k190">MOSFET Switching</li><li data-k="k191">Raspberry Pi</li><li data-k="k192">Motor Control</li><li data-k="k193">Microcontrollers</li><li data-k="k194">LED Arrays</li>
         </ul>
       </div>
 
@@ -2150,7 +2205,7 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           Software
         </h3>
         <ul class="chips">
-          <li>Python</li><li>C</li><li>MATLAB</li><li>Kotlin</li><li>Android</li><li>CameraX</li><li>Image Stitching</li><li>Web Control Interfaces</li><li>LLM APIs</li>
+          <li data-k="k196">Python</li><li data-k="k197">C</li><li data-k="k198">MATLAB</li><li data-k="k199">Kotlin + Android + CameraX</li><li data-k="k200">Image Stitching</li><li data-k="k201">Web Control Interfaces</li>
         </ul>
       </div>
 
@@ -2160,7 +2215,7 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
           Plant Science
         </h3>
         <ul class="chips">
-          <li>Plant Phenotyping</li><li>Hyperspectral Imaging</li><li>Multispectral Imaging</li><li>Chlorophyll Fluorescence</li><li>Fv&#8239;/&#8239;Fm</li><li>Microscopy</li><li>Liquid Lens Focusing</li><li>GPS / GIS Tagging</li>
+          <li data-k="k205">Plant Phenotyping</li><li data-k="k206">Hyperspectral Imaging</li><li data-k="k207">Multispectral Imaging</li><li data-k="k208">Chlorophyll Fluorescence + Fv&#8239;/&#8239;Fm</li><li data-k="k209">Microscopy</li><li data-k="k210">Liquid Lens Focusing</li><li data-k="k211">GPS / GIS Tagging</li>
         </ul>
       </div>
 
@@ -2172,8 +2227,8 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 <section id="contact">
   <div class="wrap">
     <div class="contact-card rv">
-      <h2>Get in touch</h2>
-      <p>I'm looking for a role in hardware engineering or R&amp;D. If you have
+      <h2 data-k="k213">Get in touch</h2>
+      <p data-k="k214">I'm looking for a role in hardware engineering or R&amp;D. If you have
          something open, email is the fastest way to reach me.</p>
       <div class="cta">
         <a class="btn solid" href="mailto:wangcharles362@gmail.com">
@@ -2491,28 +2546,15 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
   /* ---------- multispectral: original vs redesigned enclosure ---------- */
   var abTabs = [document.getElementById("abTabA"), document.getElementById("abTabB")];
   var abViews = [document.getElementById("abViewA"), document.getElementById("abViewB")];
-  var abNotes = document.getElementById("abNotes");
+  var abNotes = [document.getElementById("abNotesA"), document.getElementById("abNotesB")];
 
-  if (abTabs[0] && abNotes) {
-    var AB_COPY = [
-      [
-        { txt: "Raspberry Pi in an <strong>external housing</strong>, hung off the body" },
-        { txt: "Wiring <strong>ran outside the enclosure</strong>, between the head and the controller" },
-        { txt: "<strong>Nothing documented</strong> &mdash; every subsystem had to be traced before it could change" }
-      ],
-      [
-        { txt: "<strong>Raspberry Pi mounted on the inner wall</strong>, inside the shell", good: true },
-        { txt: "<strong>All electronics internal</strong>, MOSFET switching and 12V/5V conversion included", good: true },
-        { txt: "<strong>Every subsystem reverse-engineered and documented</strong> before the rebuild", good: true }
-      ]
-    ];
-
+  if (abTabs[0] && abNotes[0]) {
+    // both note lists live in the markup so they stay editable copy; this only
+    // swaps which one is shown
     var abShow = function (i) {
       abTabs.forEach(function (t, n) { t.setAttribute("aria-selected", n === i ? "true" : "false"); });
       abViews.forEach(function (v, n) { v.classList.toggle("on", n === i); });
-      abNotes.innerHTML = AB_COPY[i].map(function (n) {
-        return "<li" + (n.good ? ' class="good"' : "") + ">" + n.txt + "</li>";
-      }).join("");
+      abNotes.forEach(function (u, n) { u.hidden = n !== i; });
     };
 
     abTabs.forEach(function (t, i) {
@@ -2687,21 +2729,6 @@ document.documentElement.setAttribute("data-theme",s||"dark");})();
 
   figures.forEach(function (f, i) {
     f.addEventListener("click", function () { open(i); });
-  });
-
-  // the deck cards open their own device image, not the hero's
-  Array.prototype.forEach.call(document.querySelectorAll(".peek"), function (pk) {
-    var im = pk.querySelector("img");
-    if (!im) return;
-    var src = im.getAttribute("src");
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].src === src) {
-        (function (target) {
-          pk.addEventListener("click", function (e) { e.stopPropagation(); open(target); });
-        })(i);
-        break;
-      }
-    }
   });
 
   document.getElementById("lbClose").addEventListener("click", close);
