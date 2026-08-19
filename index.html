@@ -1545,8 +1545,13 @@ document.documentElement.className='js';
    on its way to the dark default */
 (function(){var s=null;try{s=localStorage.getItem("theme");}catch(e){}
 document.documentElement.setAttribute("data-theme",s||"dark");})();
-/* copy editor, only when asked for with #edit — visitors never fetch it */
-if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor.js";e.defer=true;document.head.appendChild(e);}
+/* copy editor, only when asked for with #edit — visitors never fetch it.
+   also listens for the hash arriving later, since typing #edit onto the URL of
+   a page you are already on does not reload it */
+(function(){var loaded=false;
+function load(){if(loaded||location.hash!=="#edit")return;loaded=true;
+var e=document.createElement("script");e.src="editor.js";e.defer=true;document.head.appendChild(e);}
+addEventListener("hashchange",load);load();})();
 </script>
 
 <!-- ══════ nav ══════ -->
@@ -2034,7 +2039,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
           <h4 data-k="k136" class="mono">Result</h4>
           <ul>
             <li data-k="k137">A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
-            <li data-k="k138">Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed publication I co-authored.</li>
+            <li data-k="k138">Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed <a class="lnk-glow" href="https://www.scopus.com/pages/publications/105017421498" target="_blank" rel="noopener">publication</a> I co-authored.</li>
           </ul>
         </div>
       </div>
@@ -2046,7 +2051,7 @@ if(location.hash==="#edit"){var e=document.createElement("script");e.src="editor
             <button data-k="k139" class="ab-tab" id="abTabA" type="button" role="tab" aria-selected="false" aria-controls="abViewA">Original</button>
             <button data-k="k140" class="ab-tab" id="abTabB" type="button" role="tab" aria-selected="true" aria-controls="abViewB">My redesign</button>
           </div>
-          <p data-k="k141">https://www.scopus.com/pages/publications/105017421498Switch between the two builds</p>
+          <p data-k="k141">Switch between the two builds</p>
         </div>
 
         <div class="ab-stage">
