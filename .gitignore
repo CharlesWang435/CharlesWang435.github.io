@@ -3,6 +3,7 @@
 # raw source material for the site's images — not for publishing
 # (contains full-resolution photos and the original device paper)
 microscope device/
+multispectral device/
 
 # local steering file for Claude Code — everything committed here is web-accessible
 CLAUDE.md
