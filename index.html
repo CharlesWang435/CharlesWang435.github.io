@@ -1649,7 +1649,7 @@ addEventListener("hashchange",load);load();})();
           <p data-k="k15" class="p-lead">
             A modular 100× microscope that
             images a full corn-leaf cross section, enabling nitrogen estimation from internal leaf structure.</p>
-          <ul class="tags">
+          <ul class="tags" data-lk="tags-microscope">
             <li data-k="k16">Optics</li><li data-k="k17">Liquid Lens</li><li data-k="k18">3D Printing</li><li data-k="k19">Motor Control</li><li data-k="k20">Web Console</li><li data-k="k21">SolidWorks</li>
           </ul>
         </div>
@@ -1671,7 +1671,7 @@ addEventListener("hashchange",load);load();})();
       <div class="details">
         <div>
           <h4 data-k="k24" class="mono">Problem</h4>
-          <ul>
+          <ul data-lk="details-microscope-problem">
             <li data-k="k25">Agricultural plant overfertilization is a massive problem in the us. costs us billions of dollars each year.&nbsp;</li>
             <li data-k="k26">Hyperspectral drones (UAVs) and imagers have their own specific benefits and limitations. Looking at physical structure through cross section may result in another parameter to calculate nitrogen.</li>
             <li data-k="k27">Traditional cross section imaging can take hours to perform, including setup and microscope focusing.</li>
@@ -1679,7 +1679,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k28" class="mono">Prototype 1 &middot; built</h4>
-          <ul>
+          <ul data-lk="details-microscope-p1">
             <li data-k="k29">A <strong>3D-printed clamp on a motorized linear rail</strong> carries the cut leaf sideways under the objective in 0.75&nbsp;mm steps, cross section facing the lens.</li>
             <li data-k="k30">A <strong>web control console</strong> (<a href="https://github.com/CharlesWang435/Leafspec-DCM" target="_blank" rel="noopener">Leafspec&#8209;DCM</a>) adds live camera preview and real-time motor control, replacing a terminal-only workflow.</li>
             <li data-k="k31"><strong>21 corn-leaf cross sections</strong> captured edge to midrib, each stitched from around 40 frames in a companion desktop app.</li>
@@ -1688,7 +1688,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k33" class="mono">Prototype 2 &middot; in progress</h4>
-          <ul>
+          <ul data-lk="details-microscope-p2">
             <li data-k="k34">An <strong>electrically tunable liquid lens</strong>, already fitted into the optical path, focuses with no moving parts, so the platform tilt no longer matters.</li>
             <li data-k="k35">The motor freed from the focusing gears now drives a <strong>weight-balanced rack-and-pinion stage</strong>, replacing the off-center linear actuator whose overhung weight tilted the stage and let in stray light.</li>
             <li data-k="k36">Target: a full cross-section scan in <strong>under 1 minute per leaf</strong>, down from 13.</li>
@@ -1767,7 +1767,7 @@ addEventListener("hashchange",load);load();})();
             evenly. A phone snaps onto the top surface, ready to image through
             the LeafDoc app, turning an ordinary smartphone into a professional imaging rig.
           </p>
-          <ul class="tags">
+          <ul class="tags" data-lk="tags-leafdoc">
             <li data-k="k56">SolidWorks</li><li data-k="k57">Kotlin</li><li data-k="k58">CameraX</li><li data-k="k59">Image Stitching</li><li data-k="k60">3D Printing</li>
           </ul>
         </div>
@@ -1780,14 +1780,14 @@ addEventListener("hashchange",load);load();})();
       <div class="details">
         <div>
           <h4 data-k="k62" class="mono">Problem</h4>
-          <ul>
+          <ul data-lk="details-leafdoc-problem">
             <li data-k="k63">Ambient light makes phone-captured leaf images inconsistent and hard to compare.</li>
             <li data-k="k64">Holding a leaf by hand introduces curl, shadow, and framing variation on every shot.</li>
           </ul>
         </div>
         <div>
           <h4 data-k="k65" class="mono">What I built</h4>
-          <ul>
+          <ul data-lk="details-leafdoc-built">
             <li data-k="k66"><strong>Contoured rollers</strong> flatten and center the leaf as it enters, so the positioning repeats without any manual adjustment.</li>
             <li data-k="k67"><strong>MagSafe mounting</strong> locks the phone in a fixed position above the sample.</li>
             <li data-k="k68"><strong>Seven enclosure revisions</strong> in SolidWorks, each one printed to test light leak, roller clearance, and component fit.</li>
@@ -1796,7 +1796,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k70" class="mono">Result</h4>
-          <ul>
+          <ul data-lk="details-leafdoc-result">
             <li data-k="k71">Overlapping frames assemble into a single full-length leaf image automatically.</li>
             <li data-k="k72">Cloud AI returns a <strong>health score, primary finding, and confidence level</strong> inside the app, with no export step or outside tools.</li>
           </ul>
@@ -1843,7 +1843,7 @@ addEventListener("hashchange",load);load();})();
             directly and non-invasively through chlorophyll fluorescence, so plant
             stress could be caught before it is visible.
           </p>
-          <ul class="tags">
+          <ul class="tags" data-lk="tags-fluoroscan">
             <li data-k="k83">Raspberry Pi</li><li data-k="k84">SolidWorks</li><li data-k="k85">Optics</li><li data-k="k86">LED Arrays</li><li data-k="k87">Fluorescence</li>
           </ul>
         </div>
@@ -1856,7 +1856,7 @@ addEventListener("hashchange",load);load();})();
       <div class="details">
         <div>
           <h4 data-k="k89" class="mono">The physics</h4>
-          <ul>
+          <ul data-lk="details-fluoroscan-physics">
             <li data-k="k90">After dark adaptation, every PSII reaction center sits open; a weak, non-actinic light reads the baseline fluorescence, <strong>F<sub>o</sub></strong>, without closing them.</li>
             <li data-k="k91">A saturating pulse closes all of them and gives the maximum fluorescence, <strong>F<sub>m</sub></strong>.</li>
             <li data-k="k92">The ratio <strong>F<sub>v</sub>/F<sub>m</sub></strong>, where F<sub>v</sub> = F<sub>m</sub> − F<sub>o</sub>, is the maximum efficiency of PSII energy conversion.</li>
@@ -1864,7 +1864,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k93" class="mono">What I built</h4>
-          <ul>
+          <ul data-lk="details-fluoroscan-built">
             <li data-k="k94"><strong>Twelve 450 nm LEDs</strong> on hand-soldered star boards, angled 3-up at the sample plane so the whole leaf lights evenly.</li>
             <li data-k="k95"><strong>4000 µmol m⁻² s⁻¹</strong> at the sample, the calculated target for closing every PSII centre at once &mdash; designed, not yet measured.</li>
             <li data-k="k96">A <strong>680/720 nm</strong> bandpass that passes the fluorescence and rejects the far brighter excitation.</li>
@@ -1873,7 +1873,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k98" class="mono">The goal</h4>
-          <ul>
+          <ul data-lk="details-fluoroscan-goal">
             <li data-k="k99">Real-time imaging that flags stress before it shows up to the eye.</li>
             <li data-k="k100">A build cost low enough that a lab without a commercial fluorometer can still take the measurement. The camera, lens and emission filter are most of the bill.</li>
           </ul>
@@ -2008,7 +2008,7 @@ addEventListener("hashchange",load);load();})();
             six wavelength bands. I redesigned and built it so that every component fits
             inside the enclosure.
           </p>
-          <ul class="tags">
+          <ul class="tags" data-lk="tags-multispectral">
             <li data-k="k122">Raspberry Pi</li><li data-k="k123">3D Printing</li><li data-k="k124">MOSFET Switching</li><li data-k="k125">Reverse Engineering</li><li data-k="k126">SolidWorks</li>
           </ul>
         </div>
@@ -2021,14 +2021,14 @@ addEventListener("hashchange",load);load();})();
       <div class="details">
         <div>
           <h4 data-k="k128" class="mono">Problem</h4>
-          <ul>
+          <ul data-lk="details-multispectral-problem">
             <li data-k="k129">The original kept the Raspberry Pi in an external housing, with wiring running outside the body.</li>
             <li data-k="k130">None of it was documented, so every subsystem had to be traced before anything could change.</li>
           </ul>
         </div>
         <div>
           <h4 data-k="k131" class="mono">What I built</h4>
-          <ul>
+          <ul data-lk="details-multispectral-built">
             <li data-k="k132"><strong>Reverse-engineered and documented every subsystem</strong>, then rebuilt the enclosure so all the electronics sit inside it.</li>
             <li data-k="k133"><strong>120+ LEDs</strong> hand-soldered across 6 wavelength bands.</li>
             <li data-k="k134">MOSFET switching with 12V/5V power conversion.</li>
@@ -2037,7 +2037,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <div>
           <h4 data-k="k136" class="mono">Result</h4>
-          <ul>
+          <ul data-lk="details-multispectral-result">
             <li data-k="k137">A high signal-to-noise ratio with ambient light fully blocked, resolving the <strong>secondary leaf veins</strong>.</li>
             <li data-k="k138">Gave a co-researcher's ML model the data to reach <strong>90% classification accuracy</strong> in a peer-reviewed <a class="lnk-glow" href="https://doi.org/10.1016/j.compag.2025.111018" target="_blank" rel="noopener">publication</a> I co-authored.</li>
           </ul>
@@ -2069,12 +2069,12 @@ addEventListener("hashchange",load);load();})();
           </div>
         </div>
 
-        <ul class="ab-notes" id="abNotesA" hidden>
+        <ul class="ab-notes" id="abNotesA" data-lk="abNotesA" hidden>
           <li data-k="k144">Raspberry Pi in an <strong>external housing</strong>, hung off the body</li>
           <li data-k="k145">Wiring <strong>ran outside the enclosure</strong>, between the head and the controller</li>
           <li data-k="k146"><strong>Nothing documented, </strong>so&nbsp;every subsystem had to be traced before it could change</li>
         </ul>
-        <ul class="ab-notes" id="abNotesB">
+        <ul class="ab-notes" id="abNotesB" data-lk="abNotesB">
           <li data-k="k147" class="good"><strong>Raspberry Pi mounted on the inner wall</strong>, inside the shell</li>
           <li data-k="k148" class="good"><strong>All electronics internal</strong>, MOSFET switching and the 12V&rarr;5V buck converter included</li>
           <li data-k="k149" class="good"><strong>Every subsystem reverse-engineered and documented</strong> before the rebuild</li>
@@ -2124,7 +2124,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <p data-k="k159" class="tl-org">LeafSpec LLC &middot; Purdue ABE Plant Sensor Lab</p>
         <p data-k="k160" class="tl-note">A Purdue ag-tech startup (Prof. Jian Jin) commercialising handheld leaf imagers for farmers and researchers.</p>
-        <ul>
+        <ul data-lk="exp-leafspec">
           <li data-k="k161">Engineer handheld crop-imaging instruments from concept to field deployment: enclosures and mechanisms in SolidWorks, 3D-printed prototypes, and cameras, LED illumination, motors and microcontrollers integrated into devices plant researchers use daily.</li>
           <li data-k="k162">Build the software that runs each instrument alongside the hardware — web control consoles, Android apps, and LLM-based analysis that flags plant stress and disease from RGB leaf images.</li>
           <li data-k="k163">LeafDoc hardware supports a <strong>Purdue–DARPA project using plants as chemical sentinels</strong>, and lab imagers are in use by partners including <strong>Corteva</strong>.</li>
@@ -2138,7 +2138,7 @@ addEventListener("hashchange",load);load();})();
         </div>
         <p data-k="k166" class="tl-org">Institute for Digital Forestry, Purdue University</p>
         <p data-k="k167" class="tl-note">Paid summer research program, placed in the ABE Plant Sensor Lab.</p>
-        <ul>
+        <ul data-lk="exp-fellow">
           <li data-k="k168">Rebuilt the lab's undocumented <strong>LeafSpec-Multi</strong> multispectral imager from its SolidWorks assembly alone: tore down the legacy unit to learn how it worked, 3D-printed every part, and rebuilt the complete device.</li>
           <li data-k="k169">Hand-soldered a <strong>120+ LED illumination board</strong> across 6 wavelength bands, UV and IR, with MOSFET drivers per band on Raspberry Pi GPIO and a 12&nbsp;V→5&nbsp;V converter.</li>
           <li data-k="k170">Designed a new top enclosure that moved the Pi, driver board and converter from an external tethered box into the device body, resulting it to be&nbsp;<strong>~30% smaller</strong> and genuinely handheld, and added GPS/GIS geo-referenced capture through the app.</li>
@@ -2181,44 +2181,44 @@ addEventListener("hashchange",load);load();})();
       <h2 data-k="k182">What I work with</h2>
       <p data-k="k183"><br></p>
     </div>
-    <div class="skillset rv">
+    <div class="skillset rv" id="skillsetList">
 
-      <div class="srow">
+      <div class="srow" data-bk="skill-design">
         <h3>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span>
-          Design &amp; Fabrication
+          <span data-k="k216">Design &amp; Fabrication</span>
         </h3>
-        <ul class="chips">
+        <ul class="chips" data-lk="chips-design">
           <li data-k="k184">SolidWorks</li><li data-k="k185">3D Printing + Bambu Lab</li><li data-k="k186">Enclosure Design</li><li data-k="k187">Optical Path Layout</li>
         </ul>
       </div>
 
-      <div class="srow">
+      <div class="srow" data-bk="skill-electronics">
         <h3>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.8-1.6l9.4-11.6a.5.5 0 0 1 .9.3V10h6a1 1 0 0 1 .8 1.6l-9.4 11.6a.5.5 0 0 1-.9-.3V14H4z"/></svg></span>
-          Electronics
+          <span data-k="k217">Electronics</span>
         </h3>
-        <ul class="chips">
+        <ul class="chips" data-lk="chips-electronics">
           <li data-k="k189">Hand Soldering</li><li data-k="k190">MOSFET Switching</li><li data-k="k191">Raspberry Pi</li><li data-k="k192">Motor Control</li><li data-k="k193">Microcontrollers</li><li data-k="k194">LED Arrays</li>
         </ul>
       </div>
 
-      <div class="srow">
+      <div class="srow" data-bk="skill-software">
         <h3>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
-          Software
+          <span data-k="k218">Software</span>
         </h3>
-        <ul class="chips">
+        <ul class="chips" data-lk="chips-software">
           <li data-k="k196">Python</li><li data-k="k197">C</li><li data-k="k198">MATLAB</li><li data-k="k199">Kotlin + Android + CameraX</li><li data-k="k200">Image Stitching</li><li data-k="k201">Web Control Interfaces</li>
         </ul>
       </div>
 
-      <div class="srow">
+      <div class="srow" data-bk="skill-plant">
         <h3>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
-          Plant Science
+          <span data-k="k219">Plant Science</span>
         </h3>
-        <ul class="chips">
+        <ul class="chips" data-lk="chips-plant">
           <li data-k="k205">Plant Phenotyping</li><li data-k="k206">Hyperspectral Imaging</li><li data-k="k207">Multispectral Imaging</li><li data-k="k208">Chlorophyll Fluorescence + Fv&#8239;/&#8239;Fm</li><li data-k="k209">Microscopy</li><li data-k="k210">Liquid Lens Focusing</li><li data-k="k211">GPS / GIS Tagging</li>
         </ul>
       </div>
